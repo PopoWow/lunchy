@@ -17,3 +17,5 @@
 #Ignore eclipse stuff
 .project
 
+# Mac stuff
+.DS_store
