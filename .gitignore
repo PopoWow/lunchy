@@ -14,8 +14,11 @@
 /log/*.log
 /tmp
 
-#Ignore eclipse stuff
+# Ignore eclipse stuff
 .project
 
-# Mac stuff
+# Ignore Mac stuff
 .DS_store
+
+# Ignore textmate
+*.tmproj
