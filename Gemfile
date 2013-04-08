@@ -5,8 +5,17 @@ gem 'rails', '3.2.13'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3'
+# See ELLS appendix A for information on heroku deployment
+# for Heroku deployment - as described in Ap. A of ELLS book
+group :development, :test do
+  gem 'sqlite3'
+  gem 'debugger'
+end
 
+# for dev env use "bundle install --without production"
+group :production do
+  gem 'pg'
+end
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -37,4 +46,6 @@ gem 'jquery-rails'
 # To use debugger
 # gem 'debugger'
 
-  gem 'haml-rails'
+gem 'haml-rails' # use haml instead of erb.  This is automatically pulled by fixture creation.
+gem 'mechanize' # used to scrape waiter.com
+
