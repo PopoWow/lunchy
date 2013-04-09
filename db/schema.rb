@@ -11,12 +11,39 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130327092807) do
+ActiveRecord::Schema.define(:version => 20130409011722) do
+
+  create_table "courses", :force => true do |t|
+    t.integer  "waiter_id"
+    t.string   "description"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  create_table "dishes", :force => true do |t|
+    t.integer  "waiter_id"
+    t.string   "name"
+    t.string   "description"
+    t.float    "price"
+    t.integer  "restaurant_id"
+    t.integer  "course_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "dishes", ["course_id"], :name => "index_dishes_on_course_id"
+  add_index "dishes", ["restaurant_id"], :name => "index_dishes_on_restaurant_id"
 
   create_table "restaurants", :force => true do |t|
+    t.integer  "waiter_id"
     t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.string   "address"
+    t.string   "food_type"
+    t.binary   "logo_image"
+    t.string   "logo_url"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.string   "description"
   end
 
 end

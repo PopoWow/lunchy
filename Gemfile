@@ -10,6 +10,7 @@ gem 'rails', '3.2.13'
 group :development, :test do
   gem 'sqlite3'
   gem 'debugger'
+  gem 'database_cleaner'
 end
 
 # for dev env use "bundle install --without production"

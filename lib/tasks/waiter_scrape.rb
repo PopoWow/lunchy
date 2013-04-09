@@ -17,10 +17,10 @@ class ScraperBase
 end
 
 class WeeklyMenuData < ScraperBase
-  def initialize
+  def initialize(subdir="")
     # PWD is lunchy!  need to drill down a bit.
-    @json_file = File.join(Dir.pwd, "lib/tasks/weekly_menu.json")
-    super
+    @json_file = File.join(Dir.pwd, subdir, "weekly_menu.json")
+    super()
   end
   
   def download_weekly_menu
@@ -81,10 +81,7 @@ end
 # similar to python __name__ == "__main__":
 if __FILE__ == $0
   this_week = WeeklyMenuData.new
-  # for not, just use cached version
-  #this_week.download_weekly_menu
-  this_week.load_weekly_menu
-  #this_week.data
+  this_week.download_weekly_menu
   
   ["57", "59"].each do |earlylate|
     (1..5).each do |day|

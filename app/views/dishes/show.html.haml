@@ -1,0 +1,24 @@
+%p#notice= notice
+
+%p
+  %b Waiter:
+  = @dish.waiter_id
+%p
+  %b Name:
+  = @dish.name
+%p
+  %b Description:
+  = @dish.description
+%p
+  %b Price:
+  = @dish.price
+%p
+  %b Restaurant:
+  = @dish.restaurant
+%p
+  %b Course:
+  = @dish.course
+
+= link_to 'Edit', edit_dish_path(@dish)
+\|
+= link_to 'Back', dishes_path
