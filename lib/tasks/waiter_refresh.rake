@@ -21,8 +21,15 @@ namespace :waiter do
           menu_id = rest_hash["service"]["menu_id"]
           menu = RestaurantMenuData.new
           menu.download_menu(menu_id)
-
-          create_restaurant(rest_hash, menu.data["menu_sections"][0]["description"])
+          
+          first_rest_item = menu.data["menu_sections"][0]
+          rest_desc = get_restaurant_description(first_rest_item)
+          create_restaurant(rest_hash, rest_desc)
+          
+          # we now have menu data for the current restaurant.
+          # we can create course/meal objects from this
+          
+          
         end
       end
     end
@@ -49,6 +56,27 @@ namespace :waiter do
   
   def create_course(course_info)
     
+  end
+  
+  def get_restaurant_description(rest_item)
+    unless rest_item["menu_items"].empty?
+      # the menu_items array has something in it so it's not
+      # a "descriptive" item.
+      return ""
+    end
+    
+    unless rest_item["description"]
+      rest_item["description"] = ""
+    end
+    unless rest_item["name"]
+      rest_item["name"] = ""
+    end
+      
+    # no menu items.  This is a descriptive item.  First the largest
+    # between the name/desc and use it if it's over, say, 50 chars
+    potential_desc = rest_item["description"].length > rest_item["name"].length ?
+                        rest_item["description"] : rest_item["name"]
+    rest_desc = potential_desc.length > 50 ? potential_desc : ""                              
   end
   
   # find a way to add this to a new class?  perhaps record_updater class?
