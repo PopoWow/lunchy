@@ -3,6 +3,8 @@ require 'debugger'
 require 'mechanize'
 require 'json'
 
+require_relative 'waiter_info'
+
 class ScraperBase
   attr_reader :data
   
@@ -33,9 +35,9 @@ class WeeklyMenuData < ScraperBase
       @agent.get('http://www.waiter.com/vcs') do |login_page|
         menu_page = login_page.form_with(:action => '/user_sessions') do |login_form|
           name_field = login_form.field_with(:name => 'user_session[login]')
-          name_field.value = 'kkawamura@zonelabs.com'
+          name_field.value = waiter_account
           pw_field = login_form.field_with(:name => 'user_session[password]')
-          pw_field.value = '3zaxx34'
+          pw_field.value = waiter_password
         end.submit    
       
         # login form was submitted.  We should have the menu page now.
