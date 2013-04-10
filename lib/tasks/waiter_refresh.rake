@@ -33,6 +33,9 @@ namespace :waiter do
           # we now have menu data for the current restaurant.
           # we can create course/meal objects from this
           
+          menu.data["menu_selection"].each do |menu_course|
+            create_course(menu_course)
+          end
         end
       end
     end
@@ -58,7 +61,20 @@ namespace :waiter do
   end
   
   def create_course(course_info)
+    if course_info["menu_items"].empty?
+      return
+    end
     
+    waiter_id = course_info["id"]
+    course_name = course_info["name"]
+    course_desc = course_info["description"]
+    
+    course_hash = {:waiter_id => waiter_id,
+                   :name => course_name,
+                   :description => course_desc}
+
+    course = Course.find_or_create_by_waiter_id(waiter_id)
+    ensure_record_up_to_date(course, course_hash)
   end
   
   def get_restaurant_description(rest_item)
