@@ -9,6 +9,7 @@ namespace :waiter do
     weekly_lineup = WeeklyMenuData.new("lib/tasks")
     weekly_lineup.download_weekly_menu
     
+    # 57 = early lunch, 59 = late lunch.  Yep.
     ["57", "59"].each do |earlylate|
       (1..5).each do |day|
         datestr = weekly_lineup.data[earlylate][day]["date"] # ex: "2013-04-01T11:45:00-07:00"  aha!  a ruby datetime object... hehe
@@ -22,13 +23,15 @@ namespace :waiter do
           menu = RestaurantMenuData.new
           menu.download_menu(menu_id)
           
+          # see if we can find a usable desc.
           first_rest_item = menu.data["menu_sections"][0]
           rest_desc = get_restaurant_description(first_rest_item)
+          
+          # create or update the restaurant record
           create_restaurant(rest_hash, rest_desc)
           
           # we now have menu data for the current restaurant.
           # we can create course/meal objects from this
-          
           
         end
       end
