@@ -100,8 +100,20 @@ namespace :waiter do
     end
   end
   
-  def create_dish(new_course, dish)
+  def create_dish(course, dish_info)
+    waiter_id = dish_info["id"]
+    name = dish_info["name"]
+    description = dish_info["description"]
+    price = dish_info["formatted_price"]
+    f_price = price.to_f
     
+    dish_hash = {:waiter_id => waiter_id,
+                 :name => name,
+                 :description => description,
+                 :price => f_price}
+                 
+    new_dish = course.dishes.find_or_create_by_waiter_id(waiter_id)
+    ensure_record_up_to_date(new_dish, dish_hash)
   end
   
   def get_restaurant_description(rest_item)
@@ -128,9 +140,9 @@ namespace :waiter do
   # find a way to add this to a new class?  perhaps record_updater class?
   def ensure_record_up_to_date(record, new_info)
     changed = false
-    new_info.each do |key, val|
-      if record[key] != val
-        puts 'value for :%s changing from "%s" to "%s"' % [key.to_s, record[key], val]
+    new_info.each do |key, val|      
+      if record[key] != val # convert all record values to string for comparison
+        puts 'value for :%s changing from "%s" to "%s"' % [key, record[key], val].map{|item| item.to_s}
         record[key] = val
         changed = true
       end
