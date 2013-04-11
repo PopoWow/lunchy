@@ -32,7 +32,7 @@ namespace :waiter do
           
           # we now have menu data for the current restaurant.
           # we can create course/meal objects from this
-          menu.data["menu_sections"].each do |menu_course|
+          menu.data["menu_sections"].each do |menu_course|            
             create_course(new_restaurant, menu_course)
           end
         end
@@ -59,15 +59,30 @@ namespace :waiter do
   end
   
   def create_course(restaurant, course_info)
-    if course_info["menu_items"].empty?
-      # no menu items, this is strictly informational
-      return
-    end
     course_name = course_info["name"]
-    if course_name.include? "WAITER.COM"
+    if course_name.include? "EMPLOYEE USE ONLY"
       # hardcoded to ignore this anomalous one
       return
     end
+
+    if course_info["menu_items"].empty?
+      # no menu items, this is strictly informational
+      
+      # Okay, some of these restaurants are sneaking the name into one of 
+      # these parts and then having the name of the courses as more like
+      # a description.  See 7651-Bangkok Bay.  So, save this off so it might
+      # be used by a later iteration.
+      @saved_course_name = course_name
+      return
+    end
+    
+    if course_name.length > 80 and # 80 sounds good... but this is clearly a guess
+                                   @saved_course_name then
+      course_name = @saved_course_name       
+    end
+    
+    #only keep saved around for first iteration
+    @saved_course_name = nil    
     
     waiter_id = course_info["id"]
     course_desc = course_info["description"]
