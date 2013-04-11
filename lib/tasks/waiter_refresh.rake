@@ -28,13 +28,12 @@ namespace :waiter do
           rest_desc = get_restaurant_description(first_rest_item)
           
           # create or update the restaurant record
-          create_restaurant(rest_hash, rest_desc)
+          new_restaurant = create_restaurant(rest_hash, rest_desc)
           
           # we now have menu data for the current restaurant.
           # we can create course/meal objects from this
-          
-          menu.data["menu_selection"].each do |menu_course|
-            create_course(menu_course)
+          menu.data["menu_sections"].each do |menu_course|
+            create_course(new_restaurant, menu_course)
           end
         end
       end
@@ -56,25 +55,38 @@ namespace :waiter do
                 :description => description}
     
     restaurant = Restaurant.find_or_create_by_waiter_id(waiter_id)
-    ensure_record_up_to_date(restaurant, rec_hash)
-    end
+    return ensure_record_up_to_date(restaurant, rec_hash)
   end
   
-  def create_course(course_info)
+  def create_course(restaurant, course_info)
     if course_info["menu_items"].empty?
+      # no menu items, this is strictly informational
+      return
+    end
+    course_name = course_info["name"]
+    if course_name.include? "WAITER.COM"
+      # hardcoded to ignore this anomalous one
       return
     end
     
     waiter_id = course_info["id"]
-    course_name = course_info["name"]
     course_desc = course_info["description"]
     
     course_hash = {:waiter_id => waiter_id,
                    :name => course_name,
                    :description => course_desc}
 
-    course = Course.find_or_create_by_waiter_id(waiter_id)
-    ensure_record_up_to_date(course, course_hash)
+    new_course = restaurant.courses.find_or_create_by_waiter_id(waiter_id)
+    ensure_record_up_to_date(new_course, course_hash)
+    
+    # iterate through dishes for this menu.
+    course_info["menu_items"].each do |dish|
+      create_dish(new_course, dish)      
+    end
+  end
+  
+  def create_dish(new_course, dish)
+    
   end
   
   def get_restaurant_description(rest_item)
@@ -110,5 +122,8 @@ namespace :waiter do
     end
     if changed
       record.save!
+    end
+    
+    return record
   end    
 end
