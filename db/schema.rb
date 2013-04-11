@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130411010708) do
+ActiveRecord::Schema.define(:version => 20130411044758) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
@@ -29,14 +29,12 @@ ActiveRecord::Schema.define(:version => 20130411010708) do
     t.string   "name"
     t.string   "description"
     t.float    "price"
-    t.integer  "restaurant_id"
     t.integer  "course_id"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
   end
 
   add_index "dishes", ["course_id"], :name => "index_dishes_on_course_id"
-  add_index "dishes", ["restaurant_id"], :name => "index_dishes_on_restaurant_id"
 
   create_table "restaurants", :force => true do |t|
     t.integer  "waiter_id"
