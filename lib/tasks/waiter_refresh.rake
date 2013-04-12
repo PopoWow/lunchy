@@ -8,12 +8,20 @@ namespace :waiter do
       
     weekly_lineup = WeeklyMenuData.new("lib/tasks")
     weekly_lineup.download_weekly_menu
-    
+
+    # as we iterate over the data, collate it into this hash, ordered by day,
+    # so we can just rip through it at the end and create daily_lineup records.    
+    ordered_by_date = {}    
+
     # 57 = early lunch, 59 = late lunch.  Yep.
-    ["57", "59"].each do |earlylate|
+    EARLY = "57"; LATE = "59"
+    [EARLY, LATE].each do |earlylate|
       (1..5).each do |day|
         datestr = weekly_lineup.data[earlylate][day]["date"] # ex: "2013-04-01T11:45:00-07:00"  aha!  a ruby datetime object... hehe
-        dt_for = DateTime.parse(datestr)
+        date_for = Date.parse(datestr)
+        unless ordered_by_date[date_for]
+          ordered_by_date[date_for] = {EARLY => [], LATE => []}
+        end
         (0..2).each do |choice|
           # gather restaurant info for model 
           rest_hash = weekly_lineup.data[earlylate][day]["carts"][choice] # this is each resaurants hash data.
@@ -30,13 +38,32 @@ namespace :waiter do
           # create or update the restaurant record
           new_restaurant = create_restaurant(rest_hash, rest_desc)
           
+          # save off restaurant id for newly created rest.  Used for
+          # creating daily_lineup records later.
+          ordered_by_date[date_for][earlylate] << new_restaurant.id
+          
           # we now have menu data for the current restaurant.
           # we can create course/meal objects from this
           menu.data["menu_sections"].each do |menu_course|            
             create_course(new_restaurant, menu_course)
           end
-        end
+        end        
       end
+    end
+
+    # finally, create daily_lineup record
+    ordered_by_date.each do |date, both_lineups|
+      lineup_vals = {# this can be WAY more dynamic...
+                     :early_1_id => both_lineups[EARLY][0],
+                     :early_2_id => both_lineups[EARLY][1],
+                     :early_3_id => both_lineups[EARLY][2],
+                     :late_1_id => both_lineups[LATE][0],
+                     :late_2_id => both_lineups[LATE][1],
+                     :late_3_id => both_lineups[LATE][2]}
+      #debugger
+      puts lineup_vals
+      daily_lineup = DailyLineup.find_or_initialize_by_date(date)
+      daily_lineup.update_attributes(lineup_vals, :without_protection => true)
     end
   end
   

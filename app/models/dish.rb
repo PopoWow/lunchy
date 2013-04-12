@@ -1,6 +1,6 @@
 class Dish < ActiveRecord::Base
   belongs_to :course  
-  attr_accessible :description, :name, :price, :waiter_id
+  attr_protected
   
   def restaurant
     # helper to add easy access to owning restaurant from this model.
