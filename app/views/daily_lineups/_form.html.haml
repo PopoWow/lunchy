@@ -1,0 +1,31 @@
+= form_for @daily_lineup do |f|
+  - if @daily_lineup.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@daily_lineup.errors.count, "error")} prohibited this daily_lineup from being saved:"
+      %ul
+        - @daily_lineup.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = f.label :date
+    = f.date_select :date
+  .field
+    = f.label :early_1
+    = f.text_field :early_1
+  .field
+    = f.label :early_2
+    = f.text_field :early_2
+  .field
+    = f.label :early_3
+    = f.text_field :early_3
+  .field
+    = f.label :late_1
+    = f.text_field :late_1
+  .field
+    = f.label :late_2
+    = f.text_field :late_2
+  .field
+    = f.label :late_3
+    = f.text_field :late_3
+  .actions
+    = f.submit 'Save'

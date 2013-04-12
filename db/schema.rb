@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130411044758) do
+ActiveRecord::Schema.define(:version => 20130412064023) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
@@ -23,6 +23,25 @@ ActiveRecord::Schema.define(:version => 20130411044758) do
   end
 
   add_index "courses", ["restaurant_id"], :name => "index_courses_on_restaurant_id"
+
+  create_table "daily_lineups", :force => true do |t|
+    t.date     "date"
+    t.integer  "early_1_id"
+    t.integer  "early_2_id"
+    t.integer  "early_3_id"
+    t.integer  "late_1_id"
+    t.integer  "late_2_id"
+    t.integer  "late_3_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "daily_lineups", ["early_1_id"], :name => "index_daily_lineups_on_early_1_id"
+  add_index "daily_lineups", ["early_2_id"], :name => "index_daily_lineups_on_early_2_id"
+  add_index "daily_lineups", ["early_3_id"], :name => "index_daily_lineups_on_early_3_id"
+  add_index "daily_lineups", ["late_1_id"], :name => "index_daily_lineups_on_late_1_id"
+  add_index "daily_lineups", ["late_2_id"], :name => "index_daily_lineups_on_late_2_id"
+  add_index "daily_lineups", ["late_3_id"], :name => "index_daily_lineups_on_late_3_id"
 
   create_table "dishes", :force => true do |t|
     t.integer  "waiter_id"

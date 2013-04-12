@@ -1,4 +1,7 @@
 Lunchy::Application.routes.draw do
+  resources :daily_lineups
+
+
   resources :dishes
 
 
