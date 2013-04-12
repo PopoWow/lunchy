@@ -61,7 +61,7 @@ namespace :waiter do
                      :late_2_id => both_lineups[LATE][1],
                      :late_3_id => both_lineups[LATE][2]}
       #debugger
-      puts lineup_vals
+      #puts lineup_vals
       daily_lineup = DailyLineup.find_or_initialize_by_date(date)
       daily_lineup.update_attributes(lineup_vals, :without_protection => true)
     end
@@ -166,6 +166,8 @@ namespace :waiter do
   
   # find a way to add this to a new class?  perhaps record_updater class?
   def ensure_record_up_to_date(record, new_info)
+    # use update_properties instead?  I like the log outputs here, though.
+    # Also not sure if it has a dirty flag either...
     changed = false
     new_info.each do |key, val|      
       if record[key] != val # convert all record values to string for comparison
