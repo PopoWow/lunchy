@@ -60,10 +60,9 @@ namespace :waiter do
                      :late_1_id => both_lineups[LATE][0],
                      :late_2_id => both_lineups[LATE][1],
                      :late_3_id => both_lineups[LATE][2]}
-      #debugger
-      #puts lineup_vals
+      
       daily_lineup = DailyLineup.find_or_initialize_by_date(date)
-      daily_lineup.update_attributes(lineup_vals, :without_protection => true)
+      daily_lineup.update_attributes(lineup_vals, :without_protection => true) # saves daily_lineup
     end
   end
   

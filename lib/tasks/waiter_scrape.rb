@@ -3,8 +3,6 @@ require 'debugger'
 require 'mechanize'
 require 'json'
 
-require_relative 'waiter_info'
-
 class ScraperBase
   attr_reader :data
   
@@ -31,13 +29,14 @@ class WeeklyMenuData < ScraperBase
     if FileTest.exists?(@json_file)
       load_weekly_menu
     else
-      raise "foobar"
       @agent.get('http://www.waiter.com/vcs') do |login_page|
         menu_page = login_page.form_with(:action => '/user_sessions') do |login_form|
+          require_relative 'waiter_info'
+          
           name_field = login_form.field_with(:name => 'user_session[login]')
-          name_field.value = waiter_account
+          name_field.value = WAITER_ACCOUNT
           pw_field = login_form.field_with(:name => 'user_session[password]')
-          pw_field.value = waiter_password
+          pw_field.value = WAITER_PASSWORD
         end.submit    
       
         # login form was submitted.  We should have the menu page now.
@@ -46,19 +45,15 @@ class WeeklyMenuData < ScraperBase
         matches = menu_page.content.match(/carts: ({.*}),$/)
         # log error here, if matches is nil!
         
-        @data = JSON.parse(matches[1])
-      end
+        @data = JSON.parse(matches[1])      
 
-=begin      
-      # save off the files to text for posterity
-      f1 = open('weekly_menu.html', 'w')
-      f1.write(menu_page.content)
-      f1.close
-      
-      f2 = open('weekly_menu.json', 'w')
-      f2.write(matches[1])
-      f2.close
-=end      
+#=begin
+        # save off the files to text for posterity
+        f1 = open(@json_file, 'w')
+        f1.write(matches[1])
+        f1.close
+#=end
+      end
     end
   end  
   

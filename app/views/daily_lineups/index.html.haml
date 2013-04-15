@@ -16,12 +16,12 @@
   - @daily_lineups.each do |daily_lineup|
     %tr
       %td= daily_lineup.date
-      %td= daily_lineup.early_1
-      %td= daily_lineup.early_2
-      %td= daily_lineup.early_3
-      %td= daily_lineup.late_1
-      %td= daily_lineup.late_2
-      %td= daily_lineup.late_3
+      %td= daily_lineup.early_1.name
+      %td= daily_lineup.early_2.name
+      %td= daily_lineup.early_3.name
+      %td= daily_lineup.late_1.name
+      %td= daily_lineup.late_2.name
+      %td= daily_lineup.late_3.name
       %td= link_to 'Show', daily_lineup
       %td= link_to 'Edit', edit_daily_lineup_path(daily_lineup)
       %td= link_to 'Destroy', daily_lineup, :method => :delete, :data => { :confirm => 'Are you sure?' }
