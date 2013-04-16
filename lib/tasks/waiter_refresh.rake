@@ -1,5 +1,6 @@
-require 'time'
-require_relative 'waiter_scrape'
+$:.unshift File.join(File.dirname(__FILE__), "waiter")
+
+require 'waiter_scrape'
 
 namespace :waiter do
   task :refresh => :environment do

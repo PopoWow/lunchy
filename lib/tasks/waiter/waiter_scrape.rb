@@ -89,7 +89,7 @@ class WeeklyMenuData < ScraperBase
   def load_weekly_menu
     puts "Reading json from 'weekly_menu.json'"
     #f1 = open(@json_file)
-    f1 = open("lib/tasks/weekly_menu.json")
+    f1 = open(File.join(File.dirname(__FILE__), "weekly_menu.json"))
     json_text = f1.read
     f1.close
     @data = JSON.parse(json_text)
