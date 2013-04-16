@@ -85,7 +85,7 @@ class WeeklyMenuData < ScraperBase
     end    
   end
   
-  # deprecated testing code
+  # testing code, so i don't have to hammer away at waiter.com w/ account info.
   def load_weekly_menu
     puts "Reading json from 'weekly_menu.json'"
     #f1 = open(@json_file)
