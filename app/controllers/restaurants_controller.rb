@@ -13,7 +13,7 @@ class RestaurantsController < ApplicationController
   # GET /restaurants/1
   # GET /restaurants/1.json
   def show
-    @restaurant = Restaurant.find(params[:id])
+    @restaurant = Restaurant.includes(:courses => :dishes).find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb

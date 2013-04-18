@@ -1,19 +1,15 @@
 Lunchy::Application.routes.draw do
 
+  get "lineup/:id" => "daily_lineups#show", :as => "lineup", :constraints => {:id => /[0-9]+|today|/}
 
-  resources :daily_lineups, :only => [:index, :show], :constraints => {:id => /[0-9]+/}
+  resources :dishes, :only => [:show], :constraints => {:id => /[0-9]+/}
 
-  resources :dishes
-
-  resources :restaurants do
-    #resources :dishes, :only => [:index]
-    get "dishes" => "dishes#index_for_restaurant", :on => :member, :as => "dishes_for"
+  constraints(:id => /[0-9]+/) do
+    resources :restaurants, :only => [:show] do
+      #resources :dishes, :only => [:index]
+      get "dishes" => "dishes#index_for_restaurant", :on => :member, :as => "dishes_for"
+    end
   end
-
-
-
-
-
 
   #get "home/index"
 
@@ -66,7 +62,7 @@ Lunchy::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => 'daily_lineups#index'
+  root :to => 'daily_lineups#show', :defaults => { :id => "today" }
 
   # See how all your routes lay out with "rake routes"
 

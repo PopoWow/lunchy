@@ -1,9 +1,17 @@
 %p#notice= notice
 
-%p
-  %b Name:
-  = @restaurant.name
+%a{:href => root_path}home
 
-= link_to 'Edit', edit_restaurant_path(@restaurant)
-\|
-= link_to 'Back', restaurants_path
+%p
+  %h2= @restaurant.name
+  %h4= @restaurant.description
+
+- @restaurant.courses.each do |course|
+  %div
+    %h3= course.name
+    %h4= course.description
+    %div
+      -course.dishes.each do |dish|
+        %div
+          %h5= dish.name
+     

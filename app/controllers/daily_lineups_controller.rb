@@ -12,18 +12,22 @@ class DailyLineupsController < ApplicationController
       format.json { render json: @daily_lineups }
     end
 
-    # Query to get the next valid lineup.  Show error page if none available
-    # DailyLineup.where("date >= :start_date", {:start_date => Date.today}).order(:date).limit(1)
-
-    # FYI, DailyLineup.where(:date => (2.days.ago)..2.days.from_now).order(:date) nice!
   end
 
   # GET /daily_lineups/1
   # GET /daily_lineups/1.json
   def show
     # Don't get much from eager loading here.  So, don't bother.
-    @lineup = DailyLineup.find(params[:id])
-
+    #debugger
+    if params["id"] == "today"
+      @lineup = DailyLineup.where("date >= :today", {:today => Date.today}).order(:date).first
+    else
+      @lineup = DailyLineup.find(params[:id])
+    end
+    
+    @previous = DailyLineup.where("date < :today", {:today => @lineup.date}).order(:date).last
+    @next = DailyLineup.where("date > :today", {:today => @lineup.date}).order(:date).first
+    
     # Add some additional information to display in the view.
     @lineup.early_1.heading = "Early 1"
     @lineup.early_2.heading = "Early 2"
@@ -34,7 +38,7 @@ class DailyLineupsController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @daily_lineup }
+      format.json { render json: @lineup }
     end
   end
 
