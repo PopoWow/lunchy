@@ -1,5 +1,4 @@
 require 'time'
-require 'debugger'
 require 'mechanize'
 require 'json'
 

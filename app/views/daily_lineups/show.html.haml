@@ -2,26 +2,10 @@
 
 %p
   %b Date:
-  = @daily_lineup.date
-%p
-  %b Early 1:
-  = @daily_lineup.early_1
-%p
-  %b Early 2:
-  = @daily_lineup.early_2
-%p
-  %b Early 3:
-  = @daily_lineup.early_3
-%p
-  %b Late 1:
-  = @daily_lineup.late_1
-%p
-  %b Late 2:
-  = @daily_lineup.late_2
-%p
-  %b Late 3:
-  = @daily_lineup.late_3
-
-= link_to 'Edit', edit_daily_lineup_path(@daily_lineup)
-\|
-= link_to 'Back', daily_lineups_path
+  = @lineup.date
+  =render :partial => "lineup_item", :locals => { :selection => @lineup.early_1 }
+  =render :partial => "lineup_item", :locals => { :selection => @lineup.early_2 }
+  =render :partial => "lineup_item", :locals => { :selection => @lineup.early_3 }
+  =render :partial => "lineup_item", :locals => { :selection => @lineup.late_1 }
+  =render :partial => "lineup_item", :locals => { :selection => @lineup.late_2 }
+  =render :partial => "lineup_item", :locals => { :selection => @lineup.late_3 }

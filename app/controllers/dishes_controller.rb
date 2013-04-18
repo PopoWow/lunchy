@@ -10,6 +10,16 @@ class DishesController < ApplicationController
     end
   end
 
+  def index_for_restaurant
+    @dishes = Restaurant.find(params[:id]).dishes
+
+    respond_to do |format|
+      format.html { render :index }
+      format.xml  { render xml: @dishes }
+      format.json { render json: @dishes }
+    end
+  end
+
   # GET /dishes/1
   # GET /dishes/1.json
   def show

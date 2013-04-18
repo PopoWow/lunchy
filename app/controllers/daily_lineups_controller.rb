@@ -4,24 +4,33 @@ class DailyLineupsController < ApplicationController
   def index
     # eager load the restaurants since we're going to pull the name from them.
     # avoid N+1 problem.
-    @daily_lineups = DailyLineup.includes(:early_1, :early_2, :early_3, 
+    @daily_lineups = DailyLineup.includes(:early_1, :early_2, :early_3,
                                           :late_1,  :late_2,  :late_3)
 
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @daily_lineups }
     end
-    
+
     # Query to get the next valid lineup.  Show error page if none available
     # DailyLineup.where("date >= :start_date", {:start_date => Date.today}).order(:date).limit(1)
-    
+
     # FYI, DailyLineup.where(:date => (2.days.ago)..2.days.from_now).order(:date) nice!
   end
 
   # GET /daily_lineups/1
   # GET /daily_lineups/1.json
   def show
-    @daily_lineup = DailyLineup.find(params[:id])
+    # Don't get much from eager loading here.  So, don't bother.
+    @lineup = DailyLineup.find(params[:id])
+
+    # Add some additional information to display in the view.
+    @lineup.early_1.heading = "Early 1"
+    @lineup.early_2.heading = "Early 2"
+    @lineup.early_3.heading = "Early 3"
+    @lineup.late_1.heading = "Late 1"
+    @lineup.late_2.heading = "Late 2"
+    @lineup.late_3.heading = "Late 3"
 
     respond_to do |format|
       format.html # show.html.erb

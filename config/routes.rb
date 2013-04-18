@@ -1,14 +1,21 @@
 Lunchy::Application.routes.draw do
-  resources :daily_lineups
 
+
+  resources :daily_lineups, :only => [:index, :show], :constraints => {:id => /[0-9]+/}
 
   resources :dishes
 
+  resources :restaurants do
+    #resources :dishes, :only => [:index]
+    get "dishes" => "dishes#index_for_restaurant", :on => :member, :as => "dishes_for"
+  end
 
-  resources :restaurants
 
 
-  get "home/index"
+
+
+
+  #get "home/index"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
@@ -59,7 +66,7 @@ Lunchy::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => 'home#index'
+  root :to => 'daily_lineups#index'
 
   # See how all your routes lay out with "rake routes"
 

@@ -1,0 +1,5 @@
+%p
+  %b= "#{selection.heading}:"
+  %a{:href => restaurant_path(selection.id)}= selection.name
+  %br
+  = selection.description

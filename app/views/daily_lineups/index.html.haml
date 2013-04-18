@@ -10,8 +10,6 @@
     %th Late 2
     %th Late 3
     %th
-    %th
-    %th
 
   - @daily_lineups.each do |daily_lineup|
     %tr
@@ -23,9 +21,5 @@
       %td= daily_lineup.late_2.name
       %td= daily_lineup.late_3.name
       %td= link_to 'Show', daily_lineup
-      %td= link_to 'Edit', edit_daily_lineup_path(daily_lineup)
-      %td= link_to 'Destroy', daily_lineup, :method => :delete, :data => { :confirm => 'Are you sure?' }
 
 %br
-
-= link_to 'New Daily lineup', new_daily_lineup_path
