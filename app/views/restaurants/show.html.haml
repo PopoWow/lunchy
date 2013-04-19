@@ -13,5 +13,5 @@
     %div
       -course.dishes.each do |dish|
         %div
-          %h5= dish.name
-     
+          %h5
+            %a{:href => dish_path(dish)}= dish.name

@@ -1,5 +1,10 @@
 %p#notice= notice
 
+%a{:href => root_path}home
+%br
+back to
+%a{:href => restaurant_path(@dish.restaurant)}= @dish.restaurant.name
+
 %p
   %b Waiter:
   = @dish.waiter_id
@@ -12,13 +17,3 @@
 %p
   %b Price:
   = @dish.price
-%p
-  %b Restaurant:
-  = @dish.restaurant
-%p
-  %b Course:
-  = @dish.course
-
-= link_to 'Edit', edit_dish_path(@dish)
-\|
-= link_to 'Back', dishes_path
