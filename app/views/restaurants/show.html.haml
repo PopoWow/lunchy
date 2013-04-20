@@ -6,12 +6,17 @@
   %h2= @restaurant.name
   %h4= @restaurant.description
 
-- @restaurant.courses.each do |course|
-  %div
-    %h3= course.name
-    %h4= course.description
-    %div
-      -course.dishes.each do |dish|
-        %div
+%table
+  - @restaurant.courses.each do |course|
+    %tr
+      %td
+        %h3= course.name
+    =render :partial => "desc_row", :locals => { :item => course }
+      
+    -course.dishes.each do |dish|
+      %tr
+        %td
           %h5
             %a{:href => dish_path(dish)}= dish.name
+        %td= dish.price
+      =render :partial => "desc_row", :locals => { :item => dish }
