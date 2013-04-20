@@ -1,6 +1,7 @@
 require 'time'
 require 'mechanize'
 require 'json'
+require 'action_view'
 
 class ScraperBase
   attr_reader :data
@@ -199,6 +200,7 @@ end
 #                     create course/dish info for it.
 
 class RestaurantMenuData < ScraperBase
+  include ActionView::Helpers::SanitizeHelper
 
   def download_menu(menu_id)
     # need to use mechanize here... simple http get does not work.
@@ -228,7 +230,7 @@ class RestaurantMenuData < ScraperBase
     potential_desc = item_desc.length > item_name.length ?
                         item_desc : item_name
 
-    return potential_desc.length > 50 ? potential_desc : ""
+    return strip_tags(potential_desc.length > 50 ? potential_desc : "")
   end
 
   def process_courses_and_dishes(restaurant_parent)
