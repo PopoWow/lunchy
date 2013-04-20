@@ -1,12 +1,12 @@
 %p#notice= notice
 
 -if @previous
-  %a{:href => lineup_path(@previous)}back
+  %a{:href => lineups_path(@previous)}back
 -else
   back
 
 -if @next
-  %a{:href => lineup_path(@next)}next
+  %a{:href => lineups_path(@next)}next
 -else
   next
   

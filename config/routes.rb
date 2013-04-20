@@ -1,6 +1,6 @@
 Lunchy::Application.routes.draw do
 
-  get "lineup/:id" => "daily_lineups#show", :as => "lineup", :constraints => {:id => /[0-9]+|today|/}
+  get "lineups/:id" => "daily_lineups#show", :as => "lineups", :constraints => {:id => /[0-9]+|today/}
 
   resources :dishes, :only => [:show], :constraints => {:id => /[0-9]+/}
 
