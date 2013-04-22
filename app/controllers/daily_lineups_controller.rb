@@ -25,6 +25,12 @@ class DailyLineupsController < ApplicationController
       @lineup = DailyLineup.find(params[:id])
     end
     
+    unless @lineup
+      @previous = DailyLineup.where("date < :today", {:today => Date.today}).order(:date).last
+      render :blank
+      return
+    end
+    
     @previous = DailyLineup.where("date < :today", {:today => @lineup.date}).order(:date).last
     @next = DailyLineup.where("date > :today", {:today => @lineup.date}).order(:date).first
     
