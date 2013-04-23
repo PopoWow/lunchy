@@ -241,6 +241,16 @@ class WeeklyMenuData < ScraperBase
     end        
   end
   
+  def update_active_flags
+    #courses = Course.all
+    #courses.each 
+  end
+  
+  def update_course_averages
+    courses = Course.all
+    courses.each
+  end
+  
 end
 
 ######################################################################
