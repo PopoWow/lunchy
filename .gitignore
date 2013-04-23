@@ -16,6 +16,7 @@
 
 # Ignore eclipse stuff
 .project
+.settings
 
 # Ignore Mac stuff
 .DS_store

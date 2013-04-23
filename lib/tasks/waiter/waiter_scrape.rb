@@ -42,17 +42,15 @@ class WeeklyMenuData < ScraperBase
   FIRST_CHOICE = 0; LAST_CHOICE = 2
 
   # path to the saved weekly lineup json files
-  LINEUPS_PATH = "#{RAILS_ROOT}/tmp/waiter/lineups"
+  LINEUPS_PATH = Rails.root.join("tmp/waiter/lineups") 
 
-  def initialize
-    @debug = true
-  end
-
+  DEBUG = true
+  
   def download_and_populate_db_in_stages
     # download lineup + all restaurant menu information and save locally as
     # .json files.
 
-    if @debug
+    if DEBUG
       # if we're running in debug mode, skip download stage and just
       # use last version of downloaded lineup
 
@@ -68,28 +66,33 @@ class WeeklyMenuData < ScraperBase
         end
       end
 
-      download_weekly_lineup
-      save_weekly_lineup_file
+      download_and_save_weekly_lineup_file
     end
 
     # so no @data should have parsed lineup info.  Use that to
     # download the individual restaurant menus.
     download_menus
+    
+    # if we're here, then all menu data has been downloaded into memory.  Process it.
+    process_weekly_lineup_data
   end
 
   # testing code, so i don't have to hammer away at waiter.com w/ account info.
-  def load_weekly_menu
+  def load_weekly_lineup_file
     puts "Refreshing restaurant lineup for the week (from local .json)"
-
-    #f1 = open(@json_file)
-    f1 = open(File.join(File.dirname(__FILE__), "weekly_menu.json"))
-    json_text = f1.read
-    f1.close
-    @data = JSON.parse(json_text)
-    process_downloaded_weekly_lineup_data
+    
+    lineup_files = Dir.glob(File.join(LINEUPS_PATH, "lineup_*.json"))
+    if lineup_files.empty?
+      download_and_save_weekly_lineup_file
+    else
+      open(lineup_files.last, "r") do |lineup_file|
+        @data = JSON.parse(lineup_file.read)
+      end
+    end
   end
 
-  def download_weekly_lineup
+  def download_and_save_weekly_lineup_file
+    puts "Refreshing restaurant lineup for the week (from waiter.com)"
     @agent.get('http://www.waiter.com/vcs') do |login_page|
       menu_page = login_page.form_with(:action => '/user_sessions') do |login_form|
         name_field = login_form.field_with(:name => 'user_session[login]')
@@ -104,6 +107,8 @@ class WeeklyMenuData < ScraperBase
       # log error here, if matches is nil!
 
       @data = JSON.parse(matches[1])
+      
+      save_weekly_lineup_file
     end
   end
 
@@ -112,7 +117,8 @@ class WeeklyMenuData < ScraperBase
       FileUtils.mkpath(LINEUPS_PATH)
     end
 
-    File.open(File.join(@json_path, "#{Time.now.utc.to_s}.json"), "w") do |outfile|
+    file_path = File.join(LINEUPS_PATH, "lineup_#{Time.now.utc.to_s}.json").gsub(":", "-")
+    File.open(file_path, "w") do |outfile|
       outfile.puts(JSON.pretty_generate(@data))
     end
   end
@@ -120,21 +126,21 @@ class WeeklyMenuData < ScraperBase
   def download_menus
     # iterate through the restaurants for the week and download those.
     # save into a hash to populate DB later.
-    @menus = {)
+    @menus = {}
     [EARLY, LATE].each do |earlylate|
       (MONDAY..FRIDAY).each do |day|
         (FIRST_CHOICE..LAST_CHOICE).each do |choice|
           menu_id = @data[earlylate][day]["carts"][choice]["service"]["menu_id"]
-          menus[menu_id] = RestaurantMenuData.new
-          menus[menu_id].download_menu(menu_id)
+          name = @data[earlylate][day]["carts"][choice]["service"]["store"]["name"]
+          
+          puts "Downloading menu for restaurant: #{name}"
+          @menus[menu_id] = RestaurantMenuData.new
+          @menus[menu_id].download_menu(menu_id)
         end
       end
     end
   end
 
-  def load_weekly_items
-
-  end
 
 
 
@@ -148,7 +154,7 @@ class WeeklyMenuData < ScraperBase
 
 
 
-  def process_downloaded_weekly_lineup_data
+  def process_weekly_lineup_data
     # as we iterate over the data, collate it into this hash, ordered by day,
     # so we can just rip through it at the end and create daily_lineup records.
     ordered_by_date = {}
@@ -172,8 +178,8 @@ class WeeklyMenuData < ScraperBase
 
           # menu description needs to be pulled from restaurant specific json
           menu_id = rest_hash["service"]["menu_id"]
-          restaurant_menu = RestaurantMenuData.new
-          restaurant_menu.download_menu(menu_id)
+          
+          restaurant_menu = @menus[menu_id]
 
           # unfortunately the restaurant description is in this
           # weekly lineup data and not the json for the restaurant.
@@ -194,8 +200,33 @@ class WeeklyMenuData < ScraperBase
       end
     end
 
+    create_daily_lineup(ordered_by_date)
+  end
+
+  def create_restaurant(rest_hash, description)
+    # several choices here, for "id", but picking this one since it's next to the name
+    waiter_id = rest_hash["service"]["store"]["id"].to_int
+    name = rest_hash["service"]["store"]["name"]
+    address = rest_hash["service"]["store"]["address"]["label"]
+    food_type = rest_hash["service"]["store"]["restaurant"]["food_types"].join(" / ")
+    logo_url = rest_hash["service"]["store"]["restaurant"]["logo_url"]
+
+    puts "Processing: #{name}"
+
+    rec_hash = {:name => name,
+                :address => address,
+                :food_type => food_type,
+                :logo_url => logo_url,
+                :description => description}
+
+    restaurant = Restaurant.find_or_initialize_by_waiter_id(waiter_id)
+    ScraperBase.log_and_update_record(restaurant, rec_hash)
+    return restaurant
+  end
+
+  def create_daily_lineup(lineup_data)
     # finally, create daily_lineup record
-    ordered_by_date.each do |date, both_lineups|
+    lineup_data.each do |date, both_lineups|
       lineup_vals = {# this can be WAY more dynamic...
                      :early_1_id => both_lineups[EARLY][0],
                      :early_2_id => both_lineups[EARLY][1],
@@ -208,27 +239,7 @@ class WeeklyMenuData < ScraperBase
       daily_lineup.update_attributes(lineup_vals, :without_protection => true) # saves daily_lineup
     end
   end
-
-  def create_restaurant(rest_hash, description)
-    # several choices here, for "id", but picking this one since it's next to the name
-    waiter_id = rest_hash["service"]["store"]["id"].to_int
-    name = rest_hash["service"]["store"]["name"]
-    address = rest_hash["service"]["store"]["address"]["label"]
-    food_type = rest_hash["service"]["store"]["restaurant"]["food_types"].join(" / ")
-    logo_url = rest_hash["service"]["store"]["restaurant"]["logo_url"]
-
-    puts name
-
-    rec_hash = {:name => name,
-                :address => address,
-                :food_type => food_type,
-                :logo_url => logo_url,
-                :description => description}
-
-    restaurant = Restaurant.find_or_initialize_by_waiter_id(waiter_id)
-    ScraperBase.log_and_update_record(restaurant, rec_hash)
-    return restaurant
-  end
+  
 end
 
 ######################################################################
@@ -344,6 +355,6 @@ end
 # similar to python __name__ == "__main__":
 if __FILE__ == $0
   weekly_lineup = WeeklyMenuData.new()
-  weekly_lineup.download_weekly_menu
+  weekly_lineup.load_weekly_lineup_file
   puts JSON.pretty_generate(weekly_lineup.data)
 end
