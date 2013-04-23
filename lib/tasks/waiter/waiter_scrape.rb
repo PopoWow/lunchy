@@ -15,7 +15,6 @@ class ScraperBase
   def initialize
     @agent = Mechanize.new
     @agent.user_agent = USER_AGENT
-    @pwd = File.dirname(__FILE__)
   end
 
   # find a way to add this to a new class?  perhaps record_updater class?
@@ -141,19 +140,8 @@ class WeeklyMenuData < ScraperBase
     end
   end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  ## Processing data
+  
   def process_weekly_lineup_data
     # as we iterate over the data, collate it into this hash, ordered by day,
     # so we can just rip through it at the end and create daily_lineup records.
@@ -191,6 +179,7 @@ class WeeklyMenuData < ScraperBase
 
           # we now have menu data for the current restaurant
           # and a restaurant record to belong to.
+          restaurant_menu.date_for = date_for
           restaurant_menu.process_courses_and_dishes(new_restaurant)
 
           # save off restaurant id for newly created rest.  Used for
@@ -240,6 +229,18 @@ class WeeklyMenuData < ScraperBase
     end
   end
   
+  def dump_names
+    [EARLY, LATE].each do |earlylate|
+      (MONDAY..FRIDAY).each do |day|
+        (FIRST_CHOICE..LAST_CHOICE).each do |choice|
+          id = @data[earlylate][day]["carts"][choice]["service"]["id"]
+          name = @data[earlylate][day]["carts"][choice]["service"]["store"]["name"]          
+          puts "Downloading menu for restaurant: #{id}-#{name}"
+        end
+      end
+    end        
+  end
+  
 end
 
 ######################################################################
@@ -248,6 +249,8 @@ end
 
 class RestaurantMenuData < ScraperBase
   include ActionView::Helpers::SanitizeHelper
+  
+  attr_accessor :date_for
 
   def download_menu(menu_id)
     # need to use mechanize here... simple http get does not work.
@@ -316,6 +319,8 @@ class RestaurantMenuData < ScraperBase
 
     if course_name.length > 80 and # 80 sounds good... but this is clearly a guess
                                    @saved_course_name then
+      # in this case where the name is very long and we have a saved course name,
+      # assume that the actual course name is the saved one.
       course_name = @saved_course_name
     end
 
@@ -324,12 +329,22 @@ class RestaurantMenuData < ScraperBase
 
     waiter_id = course_info["id"]
     course_desc = course_info["description"]
+    position = course_info["position"]
 
     course_hash = {:waiter_id => waiter_id,
                    :name => course_name,
-                   :description => course_desc}
+                   :description => course_desc,
+                   :position => position}
 
     new_course = restaurant.courses.find_or_create_by_waiter_id(waiter_id)
+    
+    # only update date_for if it's later than the current one.  This is
+    # for the edge case where a restaurant is specified twice for a week.
+    # Not even sure if this would ever happen in a production environment.
+    if new_course.date_for and new_course.date_for < @date_for
+      course_hash[:date_for] = @date_for
+    end
+    
     ScraperBase.log_and_update_record(new_course, course_hash)
 
     return new_course
@@ -339,15 +354,24 @@ class RestaurantMenuData < ScraperBase
     waiter_id = dish_info["id"]
     name = dish_info["name"]
     description = dish_info["description"]
-    price = dish_info["formatted_price"]
-    f_price = price.to_f
+    price = dish_info["formatted_price"].to_f
+    position = dish_info["position"]
 
     dish_hash = {:waiter_id => waiter_id,
                  :name => name,
                  :description => description,
-                 :price => f_price}
+                 :price => price,
+                 :position => position}
 
     new_dish = course.dishes.find_or_create_by_waiter_id(waiter_id)
+    
+    # only update date_for if it's later than the current one.  This is
+    # for the edge case where a restaurant is specified twice for a week.
+    # Not even sure if this would ever happen in a production environment.
+    if new_dish.date_for and new_dish.date_for < @date_for
+      dish_hash[:date_for] = @date_for
+    end
+    
     ScraperBase.log_and_update_record(new_dish, dish_hash)
   end
 end
@@ -356,5 +380,5 @@ end
 if __FILE__ == $0
   weekly_lineup = WeeklyMenuData.new()
   weekly_lineup.load_weekly_lineup_file
-  puts JSON.pretty_generate(weekly_lineup.data)
+  weekly_lineup.dump_names
 end
