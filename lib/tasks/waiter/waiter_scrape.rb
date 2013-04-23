@@ -3,14 +3,11 @@ require 'mechanize'
 require 'json'
 require 'action_view'
 
+######################################################################
+# ScraperBase: Base class for scraper classes.  Handles the grunt
+# =>           work of mechanize
+
 class ScraperBase
-  attr_reader :data
-
-  # make the json analysis code more readable
-  EARLY = "57"; LATE = "59" # 57 = early lunch, 59 = late lunch.  Yep.
-  MONDAY = 1; FRIDAY = 5
-  FIRST_CHOICE = 0; LAST_CHOICE = 2
-
   # see AGENT_ALIASES for full list of predefined with use with user_agent_alias
   # or roll your own via user_agent:
   USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.43 Safari/537.31"
@@ -18,23 +15,18 @@ class ScraperBase
   def initialize
     @agent = Mechanize.new
     @agent.user_agent = USER_AGENT
+    @pwd = File.dirname(__FILE__)
   end
 
   # find a way to add this to a new class?  perhaps record_updater class?
-  def self.ensure_record_up_to_date(record, new_info)
-    # use update_attributes instead?  I like the log outputs here, though.
-    # Also not sure if it has a dirty flag either...
-    changed = false
+  def self.log_and_update_record(record, new_info)
     new_info.each do |key, val|
       if record[key] != val # convert all record values to string for comparison
         puts 'value for :%s changing from "%s" to "%s"' % [key, record[key], val].map{|item| item.to_s}
-        record[key] = val
-        changed = true
       end
     end
-    if changed
-      record.save!
-    end
+    #record.touch don't modify updated_at field anymore.  Using date_for to track activity.
+    record.update_attributes(new_info)
   end
 end
 
@@ -44,60 +36,45 @@ end
 
 class WeeklyMenuData < ScraperBase
 
+  # make the json analysis code more readable
+  EARLY = "57"; LATE = "59" # 57 = early lunch, 59 = late lunch.  Yep.
+  MONDAY = 1; FRIDAY = 5
+  FIRST_CHOICE = 0; LAST_CHOICE = 2
+
+  # path to the saved weekly lineup json files
+  LINEUPS_PATH = "#{RAILS_ROOT}/tmp/waiter/lineups"
+
   def initialize
     @debug = true
   end
 
-  def download_lineup_and_populate_db
-    # log into waiter.com and pull down the weekly lineup.
-    # Use this lineup data to pull menus for the individual
-    # restaurants and create courses/dishes records from them.
-    # At the end, reorder the lineup data that better suits
-    # our needs (i.e. top level is ordered by day, then
-    # early/late choices are filed under that).  Create
-    # DailyLineup records with that.
+  def download_and_populate_db_in_stages
+    # download lineup + all restaurant menu information and save locally as
+    # .json files.
 
     if @debug
-      load_weekly_menu
+      # if we're running in debug mode, skip download stage and just
+      # use last version of downloaded lineup
+
+      load_weekly_lineup_file
     else
-      # check and see if we need an update at all
-      # NOTE: using first here instead of something like limit(1)
-      #       due to lazy loading issues.
+      # First check and see if there's the possibility of updated items
       last_lineup = DailyLineup.select(:date).order("date DESC").first
       if last_lineup
-        # check and see if the last one is beyond today.
-        if Date.today. > last_lineup.date
-          download_weekly_menu
-        else
+        if Date.today <= last_lineup.date
           # nothing to do, we're still up to date.
           puts "Menus already up to date"
+          return
         end
       end
+
+      download_weekly_lineup
+      save_weekly_lineup_file
     end
-  end
 
-  def download_weekly_menu
-    puts "Refreshing restaurant lineup for the week (from waiter.com)"
-
-    @agent.get('http://www.waiter.com/vcs') do |login_page|
-      menu_page = login_page.form_with(:action => '/user_sessions') do |login_form|
-        require_relative 'waiter_info'
-
-        name_field = login_form.field_with(:name => 'user_session[login]')
-        name_field.value = WAITER_ACCOUNT
-        pw_field = login_form.field_with(:name => 'user_session[password]')
-        pw_field.value = WAITER_PASSWORD
-      end.submit
-
-      # login form was submitted.  We should have the menu page now.
-
-      # Scrape the json object that contains all the data for the week
-      matches = menu_page.content.match(/carts: ({.*}),$/)
-      # log error here, if matches is nil!
-
-      @data = JSON.parse(matches[1])
-      process_downloaded_weekly_lineup_data
-    end
+    # so no @data should have parsed lineup info.  Use that to
+    # download the individual restaurant menus.
+    download_menus
   end
 
   # testing code, so i don't have to hammer away at waiter.com w/ account info.
@@ -111,6 +88,65 @@ class WeeklyMenuData < ScraperBase
     @data = JSON.parse(json_text)
     process_downloaded_weekly_lineup_data
   end
+
+  def download_weekly_lineup
+    @agent.get('http://www.waiter.com/vcs') do |login_page|
+      menu_page = login_page.form_with(:action => '/user_sessions') do |login_form|
+        name_field = login_form.field_with(:name => 'user_session[login]')
+        name_field.value = WAITER_INFO[:account]
+        pw_field = login_form.field_with(:name => 'user_session[password]')
+        pw_field.value = WAITER_INFO[:password]
+      end.submit
+      # login form was submitted.  We should have the menu page now.
+
+      # Scrape the json object that contains all the data for the week
+      matches = menu_page.content.match(/carts: ({.*}),$/)
+      # log error here, if matches is nil!
+
+      @data = JSON.parse(matches[1])
+    end
+  end
+
+  def save_weekly_lineup_file
+    unless File.directory? LINEUPS_PATH
+      FileUtils.mkpath(LINEUPS_PATH)
+    end
+
+    File.open(File.join(@json_path, "#{Time.now.utc.to_s}.json"), "w") do |outfile|
+      outfile.puts(JSON.pretty_generate(@data))
+    end
+  end
+
+  def download_menus
+    # iterate through the restaurants for the week and download those.
+    # save into a hash to populate DB later.
+    @menus = {)
+    [EARLY, LATE].each do |earlylate|
+      (MONDAY..FRIDAY).each do |day|
+        (FIRST_CHOICE..LAST_CHOICE).each do |choice|
+          menu_id = @data[earlylate][day]["carts"][choice]["service"]["menu_id"]
+          menus[menu_id] = RestaurantMenuData.new
+          menus[menu_id].download_menu(menu_id)
+        end
+      end
+    end
+  end
+
+  def load_weekly_items
+
+  end
+
+
+
+
+
+
+
+
+
+
+
+
 
   def process_downloaded_weekly_lineup_data
     # as we iterate over the data, collate it into this hash, ordered by day,
@@ -189,8 +225,8 @@ class WeeklyMenuData < ScraperBase
                 :logo_url => logo_url,
                 :description => description}
 
-    restaurant = Restaurant.find_or_create_by_waiter_id(waiter_id)
-    ScraperBase.ensure_record_up_to_date(restaurant, rec_hash)
+    restaurant = Restaurant.find_or_initialize_by_waiter_id(waiter_id)
+    ScraperBase.log_and_update_record(restaurant, rec_hash)
     return restaurant
   end
 end
@@ -283,7 +319,7 @@ class RestaurantMenuData < ScraperBase
                    :description => course_desc}
 
     new_course = restaurant.courses.find_or_create_by_waiter_id(waiter_id)
-    ScraperBase.ensure_record_up_to_date(new_course, course_hash)
+    ScraperBase.log_and_update_record(new_course, course_hash)
 
     return new_course
   end
@@ -301,7 +337,7 @@ class RestaurantMenuData < ScraperBase
                  :price => f_price}
 
     new_dish = course.dishes.find_or_create_by_waiter_id(waiter_id)
-    ScraperBase.ensure_record_up_to_date(new_dish, dish_hash)
+    ScraperBase.log_and_update_record(new_dish, dish_hash)
   end
 end
 
