@@ -12,9 +12,11 @@
   
 %a{:href => root_path}home
 
-%p
-  %b Date:
-  = @lineup.date
+%table
+  %tr
+    %td{:colspan => 2}
+      %b Date: 
+      =@lineup.date
   =render :partial => "lineup_item", :locals => { :selection => @lineup.early_1 }
   =render :partial => "lineup_item", :locals => { :selection => @lineup.early_2 }
   =render :partial => "lineup_item", :locals => { :selection => @lineup.early_3 }
