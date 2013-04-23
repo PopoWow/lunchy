@@ -116,7 +116,7 @@ class WeeklyMenuData < ScraperBase
       FileUtils.mkpath(LINEUPS_PATH)
     end
 
-    file_path = File.join(LINEUPS_PATH, "lineup_#{Time.now.utc.to_s}.json").gsub(":", "-")
+    file_path = File.join(LINEUPS_PATH, "lineup_#{Time.now.utc.to_s.gsub(":", "-")}.json")
     File.open(file_path, "w") do |outfile|
       outfile.puts(JSON.pretty_generate(@data))
     end
