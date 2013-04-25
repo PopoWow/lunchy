@@ -299,12 +299,26 @@ class RestaurantMenuData < ScraperBase
       new_course = create_course(restaurant_parent, menu_course)
 
       if new_course
-        # Thought about putting this in create_course but I don't like
-        # nesting this behavior within that one.
-        # Iterate through dishes for this course.
+        # Iterate through "menu_items" and create the dishes.
+        # Keep track of the prices so we can calculate the
+        # average afterwards.
+        price_sum = 0.0
         menu_course["menu_items"].each do |dish|
           create_dish(new_course, dish)
+          price_sum += dish["formatted_price"].to_f
         end
+        
+        # update average price for this course.  A little wasteful
+        # since this course record is being saved twice so keep
+        # that in mind.  Perhaps only init record in create_course
+        # then assume that it will be saved here.
+        
+        # average price is used to possibly determine if courses should
+        # be hidden.  If the avg is, say, $25 then we can be farily sure
+        # that it's something like catering trays which we're not
+        # interested in.
+        course_average = price_sum / menu_course["menu_items"].count
+        ScraperBase.log_and_update_record(new_course, :average_price=>course_average)
       end
     end
   end
@@ -377,7 +391,8 @@ class RestaurantMenuData < ScraperBase
     
     # only update date_for if it's later than the current one.  This is
     # for the edge case where a restaurant is specified twice for a week.
-    # Not even sure if this would ever happen in a production environment.
+    # Not even sure if this would ever happen in a production environment
+    # because it only manifests if you run this update process twice a week.
     if new_dish.date_for and new_dish.date_for < @date_for
       dish_hash[:date_for] = @date_for
     end
