@@ -1,6 +1,7 @@
 $:.unshift File.join(File.dirname(__FILE__), "waiter")
 
 require 'waiter_scrape'
+require 'waiter_prune'
 
 namespace :waiter do
   task :refresh => :environment do
@@ -13,7 +14,7 @@ namespace :waiter do
     # First, try to download all the weekly data and save into .json files.
     # If all files are downloaded correctly, then start parsing them.
     # Before I was downloading and parsing linearly so if an error
-    # happens in the middle, you're kinda in an intermdeidate state.
+    # happens in the middle, you're kinda in an intermediate state.
 
     weekly_lineup.download_and_populate_db_in_stages
   end

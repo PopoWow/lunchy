@@ -7,10 +7,10 @@
   %h4= @restaurant.description
 
 %table
-  - @restaurant.courses.each do |course|
+  - @restaurant.courses.includes(:dishes).order("position").each do |course|
     %tr
       %td
-        %h3= course.name
+        %h3= "#{course.name} pos:#{course.position}"
     =render :partial => "desc_row", :locals => { :item => course }
       
     -course.dishes.each do |dish|
