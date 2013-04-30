@@ -41,10 +41,10 @@ class WeeklyMenuData < ScraperBase
   FIRST_CHOICE = 0; LAST_CHOICE = 2
 
   # path to the saved weekly lineup json files
-  LINEUPS_PATH = Rails.root.join("tmp/waiter/lineups") 
+  LINEUPS_PATH = Rails.root.join("tmp/waiter/lineups")
 
   DEBUG = true
-  
+
   def download_and_populate_db_in_stages
     # download lineup + all restaurant menu information and save locally as
     # .json files.
@@ -71,7 +71,7 @@ class WeeklyMenuData < ScraperBase
     # so no @data should have parsed lineup info.  Use that to
     # download the individual restaurant menus.
     download_menus
-    
+
     # if we're here, then all menu data has been downloaded into memory.  Process it.
     process_weekly_lineup_data
   end
@@ -79,7 +79,7 @@ class WeeklyMenuData < ScraperBase
   # testing code, so i don't have to hammer away at waiter.com w/ account info.
   def load_weekly_lineup_file
     puts "Refreshing restaurant lineup for the week (from local .json)"
-    
+
     lineup_files = Dir.glob(File.join(LINEUPS_PATH, "lineup_*.json"))
     if lineup_files.empty?
       download_and_save_weekly_lineup_file
@@ -106,7 +106,7 @@ class WeeklyMenuData < ScraperBase
       # log error here, if matches is nil!
 
       @data = JSON.parse(matches[1])
-      
+
       save_weekly_lineup_file
     end
   end
@@ -116,7 +116,7 @@ class WeeklyMenuData < ScraperBase
       FileUtils.mkpath(LINEUPS_PATH)
     end
 
-    file_path = File.join(LINEUPS_PATH, "lineup_#{Time.now.utc.to_s}.json").gsub(":", "-")
+    file_path = File.join(LINEUPS_PATH, "lineup_#{Time.now.utc.to_s.gsub(":", "-")}.json")
     File.open(file_path, "w") do |outfile|
       outfile.puts(JSON.pretty_generate(@data))
     end
@@ -130,9 +130,9 @@ class WeeklyMenuData < ScraperBase
           yield @data[earlylate][day]["carts"][choice]["service"]
         end
       end
-    end    
+    end
   end
-  
+
   def download_menus
     # iterate through the restaurants for the week and download those.
     # save into a hash to populate DB later.
@@ -140,7 +140,7 @@ class WeeklyMenuData < ScraperBase
     get_service_info_by_day do |service_info|
       menu_id = service_info["menu_id"]
       name = service_info["store"]["name"]
-      
+
       puts "Downloading menu for restaurant: #{name}"
       @menus[menu_id] = RestaurantMenuData.new
       @menus[menu_id].download_menu(menu_id)
@@ -148,7 +148,7 @@ class WeeklyMenuData < ScraperBase
   end
 
   ## Processing data
-  
+
   def process_weekly_lineup_data
     # as we iterate over the data, collate it into this hash, ordered by day,
     # so we can just rip through it at the end and create daily_lineup records.
@@ -175,7 +175,7 @@ class WeeklyMenuData < ScraperBase
 
           # menu description needs to be pulled from restaurant specific json
           menu_id = rest_hash["service"]["menu_id"]
-          
+
           restaurant_menu = @menus[menu_id]
 
           # unfortunately the restaurant description is in this
@@ -190,10 +190,10 @@ class WeeklyMenuData < ScraperBase
           # and a restaurant record to belong to.
           restaurant_menu.date_for = date_for
           restaurant_menu.process_courses_and_dishes(new_restaurant)
-          
+
           # now that updated courses and dishes were added we can
           # prune (mark as inactive) old ones.
-          restaurant_menu.update_active_flags          
+          restaurant_menu.update_active_flags
 
           # save off restaurant id for newly created rest.  Used for
           # creating daily_lineup records later.
@@ -207,7 +207,7 @@ class WeeklyMenuData < ScraperBase
 
   def create_restaurant(rest_hash, description)
     # several choices here, for "id", but picking this one since it's next to the name
-    waiter_id = rest_hash["service"]["store"]["id"].to_int
+    waiter_id = rest_hash["service"]["store"]["id"]
     name = rest_hash["service"]["store"]["name"]
     address = rest_hash["service"]["store"]["address"]["label"]
     food_type = rest_hash["service"]["store"]["restaurant"]["food_types"].join(" / ")
@@ -241,15 +241,15 @@ class WeeklyMenuData < ScraperBase
       daily_lineup.update_attributes(lineup_vals, :without_protection => true) # saves daily_lineup
     end
   end
-  
+
   def dump_names
     get_service_info_by_day do |service_info|
       id = service_info["menu_id"]
-      name = service_info["store"]["name"]          
+      name = service_info["store"]["name"]
       puts "Downloading menu for restaurant: #{id}-#{name}"
     end
   end
-  
+
 end
 
 ######################################################################
@@ -258,7 +258,7 @@ end
 
 class RestaurantMenuData < ScraperBase
   include ActionView::Helpers::SanitizeHelper
-  
+
   attr_accessor :date_for
 
   def download_menu(menu_id)
@@ -295,31 +295,31 @@ class RestaurantMenuData < ScraperBase
   # enumerator function to get valid course_data
   def enumerate_courses
     saved_course_name = nil
-     
+
     @data["menu_sections"].each do |course_data|
 
       # put any other filters here.
-      
+
       course_name = course_data["name"]
       if course_name.include? "EMPLOYEE USE ONLY"
         # hardcoded to ignore this anomalous one
         next
       end
-      
+
 =begin
       if course_data["menu_items"].empty?
         # no menu items, this is strictly informational
-  
+
         # Okay, some of these restaurants are sneaking the name into one of
         # these parts and then having the name of the courses as more like
         # a description.  See 7651-Bangkok Bay.  So, save this off so it might
         # be used by a later iteration.
         saved_course_name = course_name
-        
-        puts "Detected possible course name (empty course).  Saving: #{saved_course_name}"        
+
+        puts "Detected possible course name (empty course).  Saving: #{saved_course_name}"
         next
       end
-  
+
       if course_name.length > 80 and # 80 sounds good... but this is clearly a guess
                                      saved_course_name then
         puts "Overriding #{course_name} with saved: #{saved_course_name}"
@@ -328,18 +328,18 @@ class RestaurantMenuData < ScraperBase
         # assume that the actual course name is the saved one.
         course_name = saved_course_name
       end
-  
+
       #only keep saved around for first iteration
       saved_course_name = nil
 =end
       yield course_data
     end
   end
-  
+
   def process_courses_and_dishes(restaurant_parent)
     # we can create course/meal objects from this
     @restaurant_parent = restaurant_parent
-    
+
     enumerate_courses do |course_data|
       new_course = create_course(course_data)
 
@@ -352,12 +352,12 @@ class RestaurantMenuData < ScraperBase
           create_dish(new_course, dish_data)
           price_sum += dish_data["formatted_price"].to_f
         end
-        
+
         # update average price for this course.  A little wasteful
         # since this course record is being saved twice so keep
         # that in mind.  Perhaps only init record in create_course
         # then assume that it will be saved here.
-        
+
         # average price is used to possibly determine if courses should
         # be collapsed by default.  If the avg is, say, $30 then we can
         # be farily sure that it's something like catering trays which
@@ -380,14 +380,14 @@ class RestaurantMenuData < ScraperBase
                    :position => position}
 
     new_course = @restaurant_parent.courses.find_or_create_by_waiter_id(waiter_id)
-    
+
     # only update date_for if it's later than the current one.  This is
     # for the edge case where a restaurant is specified twice for a week.
     # Not even sure if this would ever happen in a production environment.
     if new_course.date_for and new_course.date_for < @date_for
       course_hash[:date_for] = @date_for
     end
-    
+
     ScraperBase.log_and_update_record(new_course, course_hash)
 
     return new_course
@@ -407,7 +407,7 @@ class RestaurantMenuData < ScraperBase
                  :position => position}
 
     new_dish = course_parent.dishes.find_or_create_by_waiter_id(waiter_id)
-    
+
     # only update date_for if it's later than the current one.  This is
     # for the edge case where a restaurant is specified twice for a week.
     # Not even sure if this would ever happen in a production environment
@@ -415,7 +415,7 @@ class RestaurantMenuData < ScraperBase
     if new_dish.date_for and new_dish.date_for < @date_for
       dish_hash[:date_for] = @date_for
     end
-    
+
     ScraperBase.log_and_update_record(new_dish, dish_hash)
   end
 
@@ -424,29 +424,31 @@ class RestaurantMenuData < ScraperBase
     # to iterate over this menu json data because it represents the
     # latest info pulled from waiter.com.  If it's referred to here
     # then it's active if not, inactive.
-    
+
+    puts "Determine course/dish activity"
+
     active_course_ids = []
     active_dish_ids = []
     @data["menu_sections"].each do |course|
-      active_course_ids << course["id"].to_int
+      active_course_ids << course["id"]
       active_dish_ids.concat(course["menu_items"].map {|dish| dish["id"]})
     end
     #puts "active courses: #{active_course_ids}"
     #puts "active dishes #{active_dish_ids}"
-    
+
     @restaurant_parent.courses.includes(:dishes).each do |course|
       if active_course_ids.include? course.waiter_id
         #puts "active: #{course.name}"
       else
         puts "inactive: #{course.created_at} - #{course.name}"
       end
-      
+
       course.dishes.each do |dish|
         if active_dish_ids.include? dish.waiter_id
           #puts "active: #{course.name}"
         else
           puts "    inactive: #{dish.created_at} - #{dish.name}"
-        end        
+        end
       end
     end
   end
@@ -454,13 +456,13 @@ class RestaurantMenuData < ScraperBase
   # Regex to parse course/dish names to strip out any headings
   def mark_inactive(parent, child, prefix = "")
     puts "#{prefix}marking #{parent.name}:#{child.name} as inactive"
-    
+
     # this is going inactive, try and find the replacement item
     # so we can migrate ratings/comments to the replacement item.
-    
+
     puts child.class.find_by_name(child.name)
   end
-  
+
   def mark_active(parent, child, prefix = "")
     #puts "#{prefix}marking #{parent.name}:#{child.name} as active"
   end

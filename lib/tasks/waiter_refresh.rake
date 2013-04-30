@@ -1,7 +1,6 @@
 $:.unshift File.join(File.dirname(__FILE__), "waiter")
 
 require 'waiter_scrape'
-require 'waiter_prune'
 
 namespace :waiter do
   task :refresh => :environment do
