@@ -5,6 +5,7 @@ class DefaultActiveToTrue < ActiveRecord::Migration
   end
 
   def down
-    # You can't currently remove default values in Rails
+    change_column :courses, :active, :boolean, :default => nil
+    change_column :dishes, :active, :boolean, :default => nil
   end
 end
