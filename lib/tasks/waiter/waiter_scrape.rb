@@ -509,14 +509,8 @@ class RestaurantMenuData < ScraperBase
   def migrate_info_from_inactive_items
     # currently, courses do not have any information to migrate so we
     # can ignore them.
-    @restaurant_parent.dishes.where(:active => false).each do |inactive_dish|
-      #match_info = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)
-      #like_term = match_info[1].prepend("%")
-      qresults = Dish.joins(:course => :restaurant).
-                      where("restaurants.id = ? AND dishes.name = ? AND dishes.active = ?",
-                            @restaurant_parent.id, inactive_dish.name, true).
-                      order("dishes.updated_at DESC").
-                      all
+    @restaurant_parent.dishes.where(:active => false).includes(:course).each do |inactive_dish|
+      qresults = find_best_match_for_inactive_dish(inactive_dish)
       if qresults.empty?
         #debugger
         puts "Could not find match for: #{inactive_dish.name}"
@@ -526,9 +520,57 @@ class RestaurantMenuData < ScraperBase
           puts "DETECTED MORE THAN ONE ACTIVE!"
         end
         #debugger
-        puts "Found match for inactive item: count: #{qresults[0].updated_at} #{qresults[0].name}"
+        #puts "Found match for inactive item: count: #{qresults[0].updated_at} #{qresults[0].name}"
       end
     end
+  end
+
+  def find_best_match_for_inactive_dish(inactive_dish)
+    # Queries are case sensitive.  work around this.
+    lower_dish = inactive_dish.name.downcase
+    lower_course = inactive_dish.course.name.downcase
+
+    # try for an exact match first.  Name + course name
+    arel_base = Dish.joins(:course => :restaurant).order("dishes.updated_at DESC")
+    qresults = arel_base.where("restaurants.id = ? AND lower(courses.name) = ? AND lower(dishes.name) = ? AND dishes.active = ?",
+                               @restaurant_parent.id, lower_course, lower_dish, true).
+                         all
+    return qresults unless qresults.empty?
+
+    # okay, that didn't work.  Try a LIKE but still use course name
+    #   strip out any heading info, ex: "A4.", "AB10"
+    like_term = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)[1].prepend("%").downcase
+
+    qresults = arel_base.where("restaurants.id = ? AND lower(courses.name) = ? AND lower(dishes.name) LIKE ? AND dishes.active = ?",
+                               @restaurant_parent.id, lower_course, like_term, true).
+                         all
+    unless qresults.empty?
+      puts "Found fuzzy match with exact course/LIKE name (#{like_term})"
+      return qresults
+    end
+
+    # Try exact name search anywhere
+    qresults = arel_base.where("restaurants.id = ? AND lower(dishes.name) = ? AND dishes.active = ?",
+                               @restaurant_parent.id, lower_dish, true).
+                         all
+    unless qresults.empty?
+      puts "Found fuzzy match with different course/exact name (#{inactive_dish.course.name} vs. #{qresults[0].course.name}/#{inactive_dish.name})"
+      return qresults
+    end
+
+    # okay, last chance.  Try and find a LIKE item anywhere.
+    qresults = arel_base.where("restaurants.id = ? AND lower(dishes.name) LIKE ? AND dishes.active = ?",
+                               @restaurant_parent.id, like_term, true).
+                         all
+    unless qresults.empty?
+      puts "Found fuzzy match with different course/LIKE name (#{inactive_dish.course.name} vs. #{qresults[0].course.name}/#{like_term})"
+      return qresults
+    end
+
+
+    #puts "Count not find LIKE dish match. (#{inactive_dish.course.name}" if qresults.empty?
+
+    return qresults
   end
 
 end
