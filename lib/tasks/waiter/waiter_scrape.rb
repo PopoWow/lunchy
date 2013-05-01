@@ -4,8 +4,11 @@ require 'json'
 require 'action_view'
 
 ######################################################################
+######################################################################
 # ScraperBase: Base class for scraper classes.  Handles the grunt
 # =>           work of mechanize
+######################################################################
+######################################################################
 
 class ScraperBase
   # see AGENT_ALIASES for full list of predefined with use with user_agent_alias
@@ -29,8 +32,11 @@ class ScraperBase
 end
 
 ######################################################################
+######################################################################
 # WeeklyMenuData: Pulls waiter.com weekly menu lineup and populates
 #                 DB if needed.
+######################################################################
+######################################################################
 
 class WeeklyMenuData < ScraperBase
 
@@ -142,7 +148,7 @@ class WeeklyMenuData < ScraperBase
 
       puts "Downloading menu for restaurant: #{name}"
       @menus[menu_id] = RestaurantMenuData.new
-      @menus[menu_id].download_menu(menu_id)
+      @menus[menu_id].retrieve_menu_data(menu_id)
     end
   end
 
@@ -252,19 +258,49 @@ class WeeklyMenuData < ScraperBase
 end
 
 ######################################################################
+######################################################################
 # RestaurantMenuData: Pulls menu for a specific restaurant and
 #                     create course/dish info for it.
+######################################################################
+######################################################################
 
 class RestaurantMenuData < ScraperBase
   include ActionView::Helpers::SanitizeHelper
 
+  # path to the saved weekly lineup json files
+  MENUS_PATH = Rails.root.join("tmp/waiter/menus")
+
+  DEBUG = true
+
   attr_accessor :date_for
 
-  def download_menu(menu_id)
-    # need to use mechanize here... simple http get does not work.
-    url = "https://www.waiter.com/menus/#{menu_id}.json"
-    @agent.get(url) do |menu_data|
-      @data = JSON.parse(menu_data.content)
+  def retrieve_menu_data(menu_id)
+    @file_path = File.join(MENUS_PATH, "#{menu_id}.json")
+
+    if not DEBUG or not File.exists?(@file_path)
+      # need to use mechanize here... simple http get does not work.
+      url = "https://www.waiter.com/menus/#{menu_id}.json"
+      puts "Download menu from #{url}"
+      @agent.get(url) do |menu_data|
+        @data = JSON.parse(menu_data.content)
+      end
+
+      save_weekly_menu_file
+    else
+      puts "Reading menu from #{@file_path}"
+      File.open(@file_path, "r") do |infile|
+        @data = JSON.parse(infile.read)
+      end
+    end
+  end
+
+  def save_weekly_menu_file
+    unless File.directory? MENUS_PATH
+      FileUtils.mkpath(MENUS_PATH)
+    end
+
+    File.open(@file_path, "w") do |outfile|
+      outfile.puts(JSON.pretty_generate(@data))
     end
   end
 
@@ -474,17 +510,19 @@ class RestaurantMenuData < ScraperBase
     # currently, courses do not have any information to migrate so we
     # can ignore them.
     @restaurant_parent.dishes.where(:active => false).each do |inactive_dish|
-      match_info = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)
-      like_term = match_info[1].prepend("%")
+      #match_info = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)
+      #like_term = match_info[1].prepend("%")
       qresults = Dish.joins(:course => :restaurant).
-                      where("restaurants.id = ? AND dishes.name LIKE ? AND dishes.active = ?",
-                            @restaurant_parent.id, like_term, true).
+                      where("restaurants.id = ? AND dishes.name = ? AND dishes.active = ?",
+                            @restaurant_parent.id, inactive_dish.name, true).
                       order("dishes.updated_at DESC").
                       all
       if qresults.empty?
+        #debugger
         puts "Could not find match for: #{inactive_dish.name}"
       else
         if qresults.count > 1
+          #debugger
           puts "DETECTED MORE THAN ONE ACTIVE!"
         end
         #debugger
