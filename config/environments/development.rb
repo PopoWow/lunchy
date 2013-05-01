@@ -34,4 +34,7 @@ Lunchy::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  # Log all SQL Queries... too verbose, maybe log to a file?
+  #config.active_record.logger = Logger.new(STDOUT)
 end

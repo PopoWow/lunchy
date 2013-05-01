@@ -1,7 +1,9 @@
 class Dish < ActiveRecord::Base
-  belongs_to :course  
+  belongs_to :course
   attr_protected
-  
+
+  scope :active, where(:active => true).order("position")
+
   def restaurant
     # helper to add easy access to owning restaurant from this model.
     # does this cause two queries?  Look into Eager Loading multiple assoc.

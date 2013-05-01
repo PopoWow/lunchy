@@ -11,18 +11,18 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130420165708) do
+ActiveRecord::Schema.define(:version => 20130430212742) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
     t.string   "description"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
     t.string   "name"
     t.integer  "restaurant_id"
     t.integer  "position"
     t.date     "date_for"
-    t.boolean  "active"
+    t.boolean  "active",        :default => true
     t.float    "average_price"
   end
 
@@ -53,11 +53,11 @@ ActiveRecord::Schema.define(:version => 20130420165708) do
     t.string   "description"
     t.float    "price"
     t.integer  "course_id"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
     t.integer  "position"
     t.date     "date_for"
-    t.boolean  "active"
+    t.boolean  "active",      :default => true
   end
 
   add_index "dishes", ["course_id"], :name => "index_dishes_on_course_id"
