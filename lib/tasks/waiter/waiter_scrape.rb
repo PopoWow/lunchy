@@ -24,7 +24,6 @@ class ScraperBase
         puts 'value for :%s changing from "%s" to "%s"' % [key, record[key], val].map{|item| item.to_s}
       end
     end
-    #record.touch don't modify updated_at field anymore.  Using date_for to track activity.
     record.update_attributes(new_info)
   end
 end
@@ -425,46 +424,73 @@ class RestaurantMenuData < ScraperBase
     # latest info pulled from waiter.com.  If it's referred to here
     # then it's active if not, inactive.
 
-    puts "Determine course/dish activity"
-
+    # gather list of active courses/dishes
     active_course_ids = []
     active_dish_ids = []
     @data["menu_sections"].each do |course|
       active_course_ids << course["id"]
       active_dish_ids.concat(course["menu_items"].map {|dish| dish["id"]})
     end
+
     #puts "active courses: #{active_course_ids}"
     #puts "active dishes #{active_dish_ids}"
 
+    # now iterate over all courses/dishes and compare against actives.
     @restaurant_parent.courses.includes(:dishes).each do |course|
       if active_course_ids.include? course.waiter_id
-        #puts "active: #{course.name}"
+        mark_active(course)
       else
-        puts "inactive: #{course.created_at} - #{course.name}"
+        mark_inactive(course)
       end
 
       course.dishes.each do |dish|
         if active_dish_ids.include? dish.waiter_id
-          #puts "active: #{course.name}"
+          mark_active(dish)
         else
-          puts "    inactive: #{dish.created_at} - #{dish.name}"
+          mark_inactive(dish)
         end
       end
     end
+
+    # once all items are properly flagged, we can then migrate
+    # comments/ratings/etc to the active one if needed.
+    migrate_info_from_inactive_items
   end
 
   # Regex to parse course/dish names to strip out any headings
-  def mark_inactive(parent, child, prefix = "")
-    puts "#{prefix}marking #{parent.name}:#{child.name} as inactive"
 
-    # this is going inactive, try and find the replacement item
-    # so we can migrate ratings/comments to the replacement item.
-
-    puts child.class.find_by_name(child.name)
+  def mark_active(item)
+    #puts "#{prefix}marking #{parent.name}:#{child.name} as active"
+    ScraperBase.log_and_update_record(item, :active => true)
   end
 
-  def mark_active(parent, child, prefix = "")
-    #puts "#{prefix}marking #{parent.name}:#{child.name} as active"
+  def mark_inactive(item)
+    #puts "Inactive: #{dish.created_at} - #{item.class.name}:#{dish.name}"
+
+    ScraperBase.log_and_update_record(item, :active => false)
+  end
+
+  def migrate_info_from_inactive_items
+    # currently, courses do not have any information to migrate so we
+    # can ignore them.
+    @restaurant_parent.dishes.where(:active => false).each do |inactive_dish|
+      match_info = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)
+      like_term = match_info[1].prepend("%")
+      qresults = Dish.joins(:course => :restaurant).
+                      where("restaurants.id = ? AND dishes.name LIKE ? AND dishes.active = ?",
+                            @restaurant_parent.id, like_term, true).
+                      order("dishes.updated_at DESC").
+                      all
+      if qresults.empty?
+        puts "Could not find match for: #{inactive_dish.name}"
+      else
+        if qresults.count > 1
+          puts "DETECTED MORE THAN ONE ACTIVE!"
+        end
+        #debugger
+        puts "Found match for inactive item: count: #{qresults[0].updated_at} #{qresults[0].name}"
+      end
+    end
   end
 
 end
