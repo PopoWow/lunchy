@@ -7,16 +7,16 @@
   %h4= @restaurant.description
 
 %table
-  - @restaurant.courses.active.includes(:dishes).each do |course|
+  - @restaurant.active_courses.includes(:active_dishes).each do |course|
     %tr
       %td
         %h3= "#{course.name} pos:#{course.position}"
     =render :partial => "desc_row", :locals => { :item => course }
 
-    -course.dishes.active.each do |dish|
+    -course.active_dishes.each do |dish|
       %tr
         %td
           %h5
-            %a{:href => dish_path(dish)}= dish.name
+            %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
         %td= dish.price
       =render :partial => "desc_row", :locals => { :item => dish }
