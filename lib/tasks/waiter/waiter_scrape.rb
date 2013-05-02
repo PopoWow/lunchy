@@ -3,6 +3,9 @@ require 'mechanize'
 require 'json'
 require 'action_view'
 
+LINEUP_DEBUG = true
+MENU_DEBUG = true
+
 ######################################################################
 ######################################################################
 # ScraperBase: Base class for scraper classes.  Handles the grunt
@@ -48,13 +51,11 @@ class WeeklyMenuData < ScraperBase
   # path to the saved weekly lineup json files
   LINEUPS_PATH = Rails.root.join("tmp/waiter/lineups")
 
-  DEBUG = true
-
   def download_and_populate_db_in_stages
     # download lineup + all restaurant menu information and save locally as
     # .json files.
 
-    if DEBUG
+    if LINEUP_DEBUG
       # if we're running in debug mode, skip download stage and just
       # use last version of downloaded lineup
 
@@ -270,14 +271,12 @@ class RestaurantMenuData < ScraperBase
   # path to the saved weekly lineup json files
   MENUS_PATH = Rails.root.join("tmp/waiter/menus")
 
-  DEBUG = true
-
   attr_accessor :date_for
 
   def retrieve_menu_data(menu_id)
     @file_path = File.join(MENUS_PATH, "#{menu_id}.json")
 
-    if not DEBUG or not File.exists?(@file_path)
+    if not MENU_DEBUG or not File.exists?(@file_path)
       # need to use mechanize here... simple http get does not work.
       url = "https://www.waiter.com/menus/#{menu_id}.json"
       puts "Download menu from #{url}"
@@ -539,7 +538,6 @@ class RestaurantMenuData < ScraperBase
 
     # okay, that didn't work.  Try a LIKE but still use course name
     #   strip out any heading info, ex: "A4.", "AB10"
-    like_term = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)[1].prepend("%").downcase
     match_string = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)[1].downcase
     like_term = "%#{match_string}%"
 
@@ -547,7 +545,6 @@ class RestaurantMenuData < ScraperBase
                                @restaurant_parent.id, lower_course, like_term, true).
                          all
     unless qresults.empty?
-      puts "Found fuzzy match with exact course/LIKE name (#{like_term})"
       puts "Found fuzzy match with exact course/LIKE name (#{inactive_dish.name} vs. #{qresults[0].name}/#{like_term})"
       return qresults
     end
