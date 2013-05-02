@@ -49,4 +49,4 @@ gem 'jquery-rails'
 
 gem 'haml-rails' # use haml instead of erb.  This is automatically pulled by fixture creation.
 gem 'mechanize' # used to scrape waiter.com
-
+gem 'sorcery'
