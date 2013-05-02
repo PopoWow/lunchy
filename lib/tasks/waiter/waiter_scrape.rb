@@ -540,12 +540,15 @@ class RestaurantMenuData < ScraperBase
     # okay, that didn't work.  Try a LIKE but still use course name
     #   strip out any heading info, ex: "A4.", "AB10"
     like_term = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)[1].prepend("%").downcase
+    match_string = inactive_dish.name.match(/(?:[A-Za-z0-9]+\.\s?)?(.+)/)[1].downcase
+    like_term = "%#{match_string}%"
 
     qresults = arel_base.where("restaurants.id = ? AND lower(courses.name) = ? AND lower(dishes.name) LIKE ? AND dishes.active = ?",
                                @restaurant_parent.id, lower_course, like_term, true).
                          all
     unless qresults.empty?
       puts "Found fuzzy match with exact course/LIKE name (#{like_term})"
+      puts "Found fuzzy match with exact course/LIKE name (#{inactive_dish.name} vs. #{qresults[0].name}/#{like_term})"
       return qresults
     end
 
