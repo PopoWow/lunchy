@@ -1,5 +1,3 @@
-%p#notice= notice
-
 -if @previous
   %a{:href => lineups_path(@previous)}back
 -else
@@ -9,13 +7,13 @@
   %a{:href => lineups_path(@next)}next
 -else
   next
-  
+
 %a{:href => root_path}home
 
 %table
   %tr
     %td{:colspan => 2}
-      %b Date: 
+      %b Date:
       =@lineup.date
   =render :partial => "lineup_item", :locals => { :selection => @lineup.early_1 }
   =render :partial => "lineup_item", :locals => { :selection => @lineup.early_2 }

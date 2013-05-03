@@ -4,7 +4,12 @@ Lunchy::Application.routes.draw do
   get "login" =>"sessions#new", :as => "login"
   get "signup" => "users#new", :as => "signup"
 
-  resources :users
+  resources :users do
+    member do
+      get :activate
+    end
+  end
+
   resources :sessions
 
   get "lineups/:id" => "daily_lineups#show", :as => "lineups", :constraints => {:id => /[0-9]+|today/}
