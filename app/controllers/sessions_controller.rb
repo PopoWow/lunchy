@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    debugger
+    #debugger
     user = login(params[:email], params[:password], params[:remember_me])
     if user
       redirect_back_or_to root_url, :notice => "Logged in!"

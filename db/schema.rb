@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130503060924) do
+ActiveRecord::Schema.define(:version => 20130502090514) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
@@ -75,12 +75,13 @@ ActiveRecord::Schema.define(:version => 20130503060924) do
   end
 
   create_table "users", :force => true do |t|
-    t.string   "nickname",                        :null => false
-    t.string   "email"
+    t.string   "email",                                              :null => false
     t.string   "crypted_password"
     t.string   "salt"
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
+    t.string   "nickname"
+    t.boolean  "admin",                           :default => false
+    t.datetime "created_at",                                         :null => false
+    t.datetime "updated_at",                                         :null => false
     t.string   "remember_me_token"
     t.datetime "remember_me_token_expires_at"
     t.string   "reset_password_token"
