@@ -9,6 +9,8 @@ if defined?(Bundler)
   # Bundler.require(:default, :assets, Rails.env)
 end
 
+EXT_ACCOUNT = YAML.load(File.read(File.expand_path('../ext_account.yml', __FILE__)))
+
 module Lunchy
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.

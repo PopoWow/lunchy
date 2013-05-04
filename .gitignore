@@ -24,9 +24,10 @@
 # Ignore textmate
 *.tmproj
 
-# Ignore waiter.com info
+# Ignore external account info
 waiter_info.rb
 waiter_info.yml
+ext_account.yml
 
 # Ignore scratch files
 foo.rb
