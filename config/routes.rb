@@ -1,5 +1,12 @@
 Lunchy::Application.routes.draw do
 
+# config/routes.rb
+  resources :password_resets
+
+  #get "password_resets/create"
+  #get "password_resets/edit"
+  #get "password_resets/update"
+
   get "logout" => "sessions#destroy", :as => "logout"
   get "login" =>"sessions#new", :as => "login"
   get "signup" => "users#new", :as => "signup"
