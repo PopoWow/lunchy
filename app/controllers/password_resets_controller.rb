@@ -9,7 +9,6 @@ class PasswordResetsController < ApplicationController
   # you get here when the user entered his email in the reset password form and submitted it.
   def create
     @user = User.find_by_email(params[:email])
-    debugger
 
     if @user
       # This line sends an email to the user with instructions on how to reset their password (a url with a random token)
