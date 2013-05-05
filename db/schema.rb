@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130502090514) do
+ActiveRecord::Schema.define(:version => 20130504072325) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
@@ -46,6 +46,22 @@ ActiveRecord::Schema.define(:version => 20130502090514) do
   add_index "daily_lineups", ["late_1_id"], :name => "index_daily_lineups_on_late_1_id"
   add_index "daily_lineups", ["late_2_id"], :name => "index_daily_lineups_on_late_2_id"
   add_index "daily_lineups", ["late_3_id"], :name => "index_daily_lineups_on_late_3_id"
+
+  create_table "delayed_jobs", :force => true do |t|
+    t.integer  "priority",   :default => 0
+    t.integer  "attempts",   :default => 0
+    t.text     "handler"
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.string   "queue"
+    t.datetime "created_at",                :null => false
+    t.datetime "updated_at",                :null => false
+  end
+
+  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "dishes", :force => true do |t|
     t.integer  "waiter_id"
