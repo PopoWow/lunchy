@@ -52,3 +52,9 @@ gem 'mechanize' # used to scrape waiter.com
 gem 'sorcery'
 gem 'delayed_job_active_record'
 #gem "daemons"
+
+# clean up logging
+gem 'quiet_assets', :group => :development
+# Use slim webserver instead of webrick.  Launch using "rails s slim""
+gem 'thin'
+
