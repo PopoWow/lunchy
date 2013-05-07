@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130504072325) do
+ActiveRecord::Schema.define(:version => 20130506204757) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
@@ -88,6 +88,7 @@ ActiveRecord::Schema.define(:version => 20130504072325) do
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
     t.string   "description"
+    t.string   "yelp_id"
   end
 
   create_table "users", :force => true do |t|

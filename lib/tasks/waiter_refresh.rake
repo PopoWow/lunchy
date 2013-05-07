@@ -1,4 +1,5 @@
 $:.unshift File.join(File.dirname(__FILE__), "waiter")
+$:.unshift File.join(Rails.root.join('lib/yelp'))
 
 require 'waiter_scrape'
 

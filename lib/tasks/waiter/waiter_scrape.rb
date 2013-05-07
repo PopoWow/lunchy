@@ -2,6 +2,7 @@ require 'time'
 require 'mechanize'
 require 'json'
 require 'action_view'
+require 'yelp_access'
 
 LINEUP_DEBUG = true
 MENU_DEBUG = true
@@ -42,11 +43,12 @@ end
 ######################################################################
 
 class WeeklyMenuData < ScraperBase
+  include YelpAccess
 
   # make the json analysis code more readable
   EARLY = "57"; LATE = "59" # 57 = early lunch, 59 = late lunch.  Yep.
   MONDAY = 1; FRIDAY = 5
-  FIRST_CHOICE = 0; LAST_CHOICE = 2
+  FIRST_CHOICE = 0; THIRD_CHOICE = 2
 
   # path to the saved weekly lineup json files
   LINEUPS_PATH = Rails.root.join("tmp/waiter/lineups")
@@ -132,7 +134,7 @@ class WeeklyMenuData < ScraperBase
   def get_service_info_by_day
     (MONDAY..FRIDAY).each do |day|
       [EARLY, LATE].each do |earlylate|
-        (FIRST_CHOICE..LAST_CHOICE).each do |choice|
+        (FIRST_CHOICE..THIRD_CHOICE).each do |choice|
           yield @data[earlylate][day]["carts"][choice]["service"]
         end
       end
@@ -175,7 +177,7 @@ class WeeklyMenuData < ScraperBase
           ordered_by_date[date_for] = {EARLY => [], LATE => []}
         end
 
-        (FIRST_CHOICE..LAST_CHOICE).each do |choice|
+        (FIRST_CHOICE..THIRD_CHOICE).each do |choice|
           # gather restaurant info for model
           rest_hash = @data[earlylate][day]["carts"][choice] # this is each restaurant's hash data.
 
@@ -220,6 +222,9 @@ class WeeklyMenuData < ScraperBase
     logo_url = rest_hash["service"]["store"]["restaurant"]["logo_url"]
 
     puts "Processing: #{name}"
+
+    yelp_id = get_yelp_id(name, address)
+    puts "   yelp: name:#{name} address:#{address} id:#{yelp_id}"
 
     rec_hash = {:name => name,
                 :address => address,
