@@ -4,6 +4,7 @@ require 'json'
 require 'action_view'
 require 'yelp_access'
 
+# move to config?
 LINEUP_DEBUG = true
 MENU_DEBUG = true
 
@@ -120,7 +121,7 @@ class WeeklyMenuData < ScraperBase
   end
 
   def save_weekly_lineup_file
-    unless File.directory? LINEUPS_PATH
+    if not File.directory? LINEUPS_PATH
       FileUtils.mkpath(LINEUPS_PATH)
     end
 
@@ -130,7 +131,7 @@ class WeeklyMenuData < ScraperBase
     end
   end
 
-  # iterator to retrieve menus by day
+  # generator function to retrieve menus by day
   def get_service_info_by_day
     (MONDAY..FRIDAY).each do |day|
       [EARLY, LATE].each do |earlylate|
@@ -163,7 +164,7 @@ class WeeklyMenuData < ScraperBase
     ordered_by_date = {}
     @first_day_of_week = Date.parse(@data[EARLY][MONDAY]["date"])
 
-    # not using iterator here because I need a little flexibility to get date
+    # not using generator here because I need a little flexibility to get date
     [EARLY, LATE].each do |earlylate|
       (MONDAY..FRIDAY).each do |day|
 
@@ -171,7 +172,7 @@ class WeeklyMenuData < ScraperBase
         datestr = @data[earlylate][day]["date"]
         date_for = Date.parse(datestr)
 
-        unless ordered_by_date[date_for]
+        if not ordered_by_date[date_for]
           # This date was not found, so initialize the hash val as
           # another hash with two arrays
           ordered_by_date[date_for] = {EARLY => [], LATE => []}
@@ -492,12 +493,10 @@ class RestaurantMenuData < ScraperBase
       end
     end
 
-    # once all items are properly flagged, we can then migrate
-    # comments/ratings/etc to the active one if needed.
+    # once all items are flagged as active/inactive, we can then
+    # migrate comments/ratings/etc to the active one if needed.
     migrate_info_from_inactive_items
   end
-
-  # Regex to parse course/dish names to strip out any headings
 
   def mark_active(item)
     #puts "#{prefix}marking #{parent.name}:#{child.name} as active"
@@ -549,7 +548,7 @@ class RestaurantMenuData < ScraperBase
     qresults = arel_base.where("restaurants.id = ? AND lower(courses.name) = ? AND lower(dishes.name) LIKE ? AND dishes.active = ?",
                                @restaurant_parent.id, lower_course, like_term, true).
                          all
-    unless qresults.empty?
+    if not qresults.empty?
       puts "Found fuzzy match with exact course/LIKE name (#{inactive_dish.name} vs. #{qresults[0].name}/#{like_term})"
       return qresults
     end
@@ -558,7 +557,7 @@ class RestaurantMenuData < ScraperBase
     qresults = arel_base.where("restaurants.id = ? AND lower(dishes.name) = ? AND dishes.active = ?",
                                @restaurant_parent.id, lower_dish, true).
                          all
-    unless qresults.empty?
+    if not qresults.empty?
       puts "Found fuzzy match with different course/exact name (#{inactive_dish.course.name} vs. #{qresults[0].course.name}/#{inactive_dish.name})"
       return qresults
     end
@@ -567,7 +566,7 @@ class RestaurantMenuData < ScraperBase
     qresults = arel_base.where("restaurants.id = ? AND lower(dishes.name) LIKE ? AND dishes.active = ?",
                                @restaurant_parent.id, like_term, true).
                          all
-    unless qresults.empty?
+    if not qresults.empty?
       puts "Found fuzzy match with different course/LIKE name (#{inactive_dish.course.name} vs. #{qresults[0].course.name}/#{like_term})"
       return qresults
     end
