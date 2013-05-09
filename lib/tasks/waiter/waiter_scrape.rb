@@ -235,7 +235,7 @@ class WeeklyMenuData < ScraperBase
   def create_daily_lineup(lineup_data)
     # finally, create daily_lineup record
     lineup_data.each do |date, both_lineups|
-      lineup_vals = {# this can be WAY more dynamic...
+      lineup_vals = {# figure out a smarter way to do this?
                      :early_1_id => both_lineups[EARLY][0],
                      :early_2_id => both_lineups[EARLY][1],
                      :early_3_id => both_lineups[EARLY][2],
