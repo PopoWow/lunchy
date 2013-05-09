@@ -2,8 +2,6 @@ class DailyLineupsController < ApplicationController
   # GET /daily_lineups
   # GET /daily_lineups.json
   def index
-    # eager load the restaurants since we're going to pull the name from them.
-    # avoid N+1 problem.
     @daily_lineups = DailyLineup.includes(:early_1, :early_2, :early_3,
                                           :late_1,  :late_2,  :late_3)
 
@@ -24,16 +22,24 @@ class DailyLineupsController < ApplicationController
     else
       @lineup = DailyLineup.find(params[:id])
     end
-    
-    unless @lineup
-      @previous = DailyLineup.where("date < :today", {:today => Date.today}).order(:date).last
+
+    # for the rest of these, try using relations so we can lazy load them
+    # and take advantage of fragment caching.
+
+    if not @lineup
+      # there are no lineups available for today or the future.  Show error page with
+      # a link back to the last valid lineup in case user want to review something.
+      @previous = DailyLineup.where("date < :today", {:today => Date.today}).
+                              order(:date).reverse_order # relation
       render :blank
       return
     end
-    
-    @previous = DailyLineup.where("date < :today", {:today => @lineup.date}).order(:date).last
-    @next = DailyLineup.where("date > :today", {:today => @lineup.date}).order(:date).first
-    
+
+    @previous = DailyLineup.where("date < :today", {:today => @lineup.date}).
+                            order(:date).reverse_order # relation
+    @next = DailyLineup.where("date > :today", {:today => @lineup.date}).
+                        order(:date) # relation
+
     # Add some additional information to display in the view.
     @lineup.early_1.heading = "Early 1"
     @lineup.early_2.heading = "Early 2"
