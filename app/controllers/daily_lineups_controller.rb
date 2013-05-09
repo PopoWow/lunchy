@@ -15,20 +15,28 @@ class DailyLineupsController < ApplicationController
   # GET /daily_lineups/1
   # GET /daily_lineups/1.json
   def show
-    # Don't get much from eager loading here.  So, don't bother.
-    #debugger
+    # Don't eager load here (firstly because it does no good the way
+    # DailyLineup is organized.  EL still runs 6 queries for the 6
+    # choices!).  But also, because we're caching each restaurant
+    # as a fragment so eager loading it here would be actually
+    # wasteful.
     if params["id"] == "today"
       @lineup = DailyLineup.where("date >= :today", {:today => Date.today}).order(:date).first
     else
-      @lineup = DailyLineup.find(params[:id])
+      begin
+        @lineup = DailyLineup.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        @lineup = nil
+      end
     end
 
     # for the rest of these, try using relations so we can lazy load them
     # and take advantage of fragment caching.
 
     if not @lineup
-      # there are no lineups available for today or the future.  Show error page with
-      # a link back to the last valid lineup in case user want to review something.
+      # there was no lineup found.  Either because the ID is bad or there just isn't
+      # information available for "today".  Show error page witha link back to the
+      # last valid lineup in case user want to review something.
       @previous = DailyLineup.where("date < :today", {:today => Date.today}).
                               order(:date).reverse_order # relation
       render :blank

@@ -1,6 +1,8 @@
--if @previous
-  %a{:href => lineups_path(@previous)}back
-  %br
+- previous_rec = @previous.first
+- if previous_rec
+  %a{:href => lineups_path(previous_rec)}back
+-else
+  back
 
 %div
   %h1 No available data
