@@ -425,6 +425,7 @@ Rails.application.config.sorcery.configure do |config|
   config.user_class = "User"
 end
 
+=begin
 module Sorcery
   module Model
     module InstanceMethods
@@ -436,3 +437,4 @@ module Sorcery
     end
   end
 end
+=end
