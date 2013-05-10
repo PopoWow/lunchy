@@ -6,15 +6,17 @@
 
 %table
   - @restaurant.active_courses.includes(:active_dishes).each do |course|
-    %tr
-      %td
-        %h3= "#{course.name} pos:#{course.position}"
-    =render :partial => "desc_row", :locals => { :item => course }
-
-    -course.active_dishes.each do |dish|
+    - cache ['restaurant', course] do
       %tr
         %td
-          %h5
-            %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
-        %td= dish.price
-      =render :partial => "desc_row", :locals => { :item => dish }
+          %h3= "#{course.name} pos:#{course.position}"
+      = render :partial => "desc_row", :locals => { :item => course }
+
+    - course.active_dishes.each do |dish|
+      - cache ['restaurant', dish] do
+        %tr
+          %td
+            %h5
+              %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
+          %td= dish.price
+        = render :partial => "desc_row", :locals => { :item => dish }
