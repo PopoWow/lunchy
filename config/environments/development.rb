@@ -35,10 +35,12 @@ Lunchy::Application.configure do
   # Expands the lines which load the assets
   config.assets.debug = true
 
+=begin
   new_logger = Logger.new(Rails.root.join("log/development_db.log"), 'daily')
   new_logger.formatter = Logger::Formatter.new
 
   config.active_record.logger = new_logger
+=end
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = EXT_ACCOUNT[:smtp]
