@@ -11,14 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130504072325) do
+ActiveRecord::Schema.define(:version => 20130511070322) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
-    t.string   "description"
+    t.text     "description"
     t.datetime "created_at",                      :null => false
     t.datetime "updated_at",                      :null => false
-    t.string   "name"
+    t.text     "name"
     t.integer  "restaurant_id"
     t.integer  "position"
     t.date     "date_for"
@@ -66,7 +66,7 @@ ActiveRecord::Schema.define(:version => 20130504072325) do
   create_table "dishes", :force => true do |t|
     t.integer  "waiter_id"
     t.string   "name"
-    t.string   "description"
+    t.text     "description"
     t.float    "price"
     t.integer  "course_id"
     t.datetime "created_at",                    :null => false
@@ -87,7 +87,8 @@ ActiveRecord::Schema.define(:version => 20130504072325) do
     t.string   "logo_url"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
-    t.string   "description"
+    t.text     "description"
+    t.string   "yelp_id"
   end
 
   create_table "users", :force => true do |t|
