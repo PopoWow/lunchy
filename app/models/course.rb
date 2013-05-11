@@ -9,8 +9,9 @@ class Course < ActiveRecord::Base
            :conditions => ['active = ?', true], :order => :position
 
   belongs_to :restaurant
+
   attr_protected
 
   # abandoning in favor of association above
-  scope :active, where(:active => true).order("position")
+  #scope :active, where(:active => true).order("position")
 end
