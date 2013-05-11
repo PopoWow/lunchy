@@ -8,15 +8,13 @@ gem 'rails', '3.2.13'
 # See ELLS appendix A for information on heroku deployment
 # for Heroku deployment - as described in Ap. A of ELLS book
 group :development, :test do
-  gem 'sqlite3'
   gem 'debugger'
   gem 'database_cleaner'
 end
 
-# for dev env use "bundle install --without production"
-group :production do
-  gem 'pg'
-end
+# Using postgres for all configurations now.
+#gem 'sqlite3'
+gem 'pg'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -55,6 +53,6 @@ gem 'delayed_job_active_record'
 
 # clean up logging
 gem 'quiet_assets', :group => :development
-# Use slim webserver instead of webrick.  Launch using "rails s slim""
+# Use thin webserver instead of webrick.  Launch using "rails s thin""
 gem 'thin'
 
