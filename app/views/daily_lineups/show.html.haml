@@ -18,9 +18,6 @@
     %td{:colspan => 2}
       %b Date:
       =@lineup.date
-  =render :partial => "lineup_item", :locals => { :selection => @lineup.early_1 }
-  =render :partial => "lineup_item", :locals => { :selection => @lineup.early_2 }
-  =render :partial => "lineup_item", :locals => { :selection => @lineup.early_3 }
-  =render :partial => "lineup_item", :locals => { :selection => @lineup.late_1 }
-  =render :partial => "lineup_item", :locals => { :selection => @lineup.late_2 }
-  =render :partial => "lineup_item", :locals => { :selection => @lineup.late_3 }
+  - @lineup.schedulings.includes(:restaurant).each do |scheduling|
+    =render :partial => "lineup_item",
+            :locals => { :scheduling => scheduling, :restaurant => scheduling.restaurant }

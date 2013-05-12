@@ -48,14 +48,6 @@ class DailyLineupsController < ApplicationController
     @next = DailyLineup.where("date > :today", {:today => @lineup.date}).
                         order(:date) # relation
 
-    # Add some additional information to display in the view.
-    @lineup.early_1.heading = "Early 1"
-    @lineup.early_2.heading = "Early 2"
-    @lineup.early_3.heading = "Early 3"
-    @lineup.late_1.heading = "Late 1"
-    @lineup.late_2.heading = "Late 2"
-    @lineup.late_3.heading = "Late 3"
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @lineup }

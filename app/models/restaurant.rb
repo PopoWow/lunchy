@@ -1,4 +1,10 @@
 class Restaurant < ActiveRecord::Base
+  # associations to DailyLineup
+  has_many :schedulings
+  has_many :daily_lineups, :through => :schedulings,
+           :order => :date
+
+# associations to Course/Dish
   has_many :courses, :dependent => :destroy
   has_many :dishes, :through => :courses
 
@@ -10,6 +16,4 @@ class Restaurant < ActiveRecord::Base
   # has_many :received_private_messages, :class_name => 'PrivateMessage', :foreign_key => 'recipient_id'
 
   attr_protected
-
-  attr_accessor :heading
 end

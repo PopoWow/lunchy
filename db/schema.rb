@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130511070322) do
+ActiveRecord::Schema.define(:version => 20130511074702) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
@@ -30,22 +30,9 @@ ActiveRecord::Schema.define(:version => 20130511070322) do
 
   create_table "daily_lineups", :force => true do |t|
     t.date     "date"
-    t.integer  "early_1_id"
-    t.integer  "early_2_id"
-    t.integer  "early_3_id"
-    t.integer  "late_1_id"
-    t.integer  "late_2_id"
-    t.integer  "late_3_id"
     t.datetime "created_at", :null => false
     t.datetime "updated_at", :null => false
   end
-
-  add_index "daily_lineups", ["early_1_id"], :name => "index_daily_lineups_on_early_1_id"
-  add_index "daily_lineups", ["early_2_id"], :name => "index_daily_lineups_on_early_2_id"
-  add_index "daily_lineups", ["early_3_id"], :name => "index_daily_lineups_on_early_3_id"
-  add_index "daily_lineups", ["late_1_id"], :name => "index_daily_lineups_on_late_1_id"
-  add_index "daily_lineups", ["late_2_id"], :name => "index_daily_lineups_on_late_2_id"
-  add_index "daily_lineups", ["late_3_id"], :name => "index_daily_lineups_on_late_3_id"
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -90,6 +77,18 @@ ActiveRecord::Schema.define(:version => 20130511070322) do
     t.text     "description"
     t.string   "yelp_id"
   end
+
+  create_table "schedulings", :id => false, :force => true do |t|
+    t.integer  "daily_lineup_id"
+    t.integer  "restaurant_id"
+    t.integer  "position"
+    t.integer  "shift"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+  end
+
+  add_index "schedulings", ["daily_lineup_id"], :name => "index_schedulings_on_daily_lineup_id"
+  add_index "schedulings", ["restaurant_id"], :name => "index_schedulings_on_restaurant_id"
 
   create_table "users", :force => true do |t|
     t.string   "email",                                              :null => false
