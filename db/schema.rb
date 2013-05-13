@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130511074702) do
+ActiveRecord::Schema.define(:version => 20130513212400) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"

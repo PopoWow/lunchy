@@ -2,6 +2,7 @@ require 'time'
 require 'mechanize'
 require 'json'
 require 'action_view'
+require 'yelp_access'
 
 # move to config?
 LINEUP_DEBUG = true
@@ -43,6 +44,7 @@ end
 ######################################################################
 
 class WeeklyMenuData < ScraperBase
+  include YelpAccess
 
   # make the json analysis code more readable
   EARLY = "57"; LATE = "59" # 57 = early lunch, 59 = late lunch.  Yep.
@@ -221,6 +223,9 @@ class WeeklyMenuData < ScraperBase
     logo_url = rest_hash["service"]["store"]["restaurant"]["logo_url"]
 
     puts "Processing: #{name}"
+
+    yelp_id = get_yelp_id(name, address)
+    puts "   yelp: name:#{name} address:#{address} id:#{yelp_id}"
 
     rec_hash = {:name => name,
                 :address => address,
