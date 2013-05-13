@@ -209,7 +209,7 @@ class WeeklyMenuData < ScraperBase
       end
     end
 
-    create_daily_lineup(ordered_by_date)
+    create_daily_lineups(ordered_by_date)
   end
 
   def create_restaurant(rest_hash, description)
@@ -233,7 +233,10 @@ class WeeklyMenuData < ScraperBase
     return restaurant
   end
 
-  def create_daily_lineup(lineup_data)
+  def create_daily_lineups(lineup_data)
+    # get first date for this week
+    touch_last_lineup(lineup_data.sort.first.first)
+
     # finally, create daily_lineup record
     lineup_data.each do |date, both_lineups|
       daily_lineup = DailyLineup.find_or_create_by_date!(date)
@@ -247,9 +250,16 @@ class WeeklyMenuData < ScraperBase
                                             :restaurant_id => both_lineups[shift][choice]).
                                       first_or_create!({:shift => shift_val, :position => position},
                                                        :without_protection => true)
-          #new_scheduling.save!
         end
       end
+    end
+  end
+
+  def touch_last_lineup(first_date)
+    # need to touch last valid lineup to update frag cache for navbar.
+    last = DailyLineup.where("date < ?", first_date).order(:date).last
+    if last
+      last.touch
     end
   end
 
