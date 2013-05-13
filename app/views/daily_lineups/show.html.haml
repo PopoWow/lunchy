@@ -20,4 +20,6 @@
       =@lineup.date
   - @lineup.schedulings.includes(:restaurant).each do |scheduling|
     =render :partial => "lineup_item",
-            :locals => { :scheduling => scheduling, :restaurant => scheduling.restaurant }
+            :locals => { :date => @lineup.date,
+                         :scheduling => scheduling,
+                         :restaurant => scheduling.restaurant }

@@ -1,4 +1,4 @@
-- cache ['lineup', restaurant] do
+- cache ['lineup', date, restaurant] do
   %tr
     - row_span = if restaurant.description.empty? then 1 else 2 end
     %td{:width => "100", :rowspan => row_span}
