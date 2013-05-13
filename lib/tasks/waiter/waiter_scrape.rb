@@ -236,16 +236,20 @@ class WeeklyMenuData < ScraperBase
   def create_daily_lineup(lineup_data)
     # finally, create daily_lineup record
     lineup_data.each do |date, both_lineups|
-      lineup_vals = {# figure out a smarter way to do this?
-                     :early_1_id => both_lineups[EARLY][0],
-                     :early_2_id => both_lineups[EARLY][1],
-                     :early_3_id => both_lineups[EARLY][2],
-                     :late_1_id => both_lineups[LATE][0],
-                     :late_2_id => both_lineups[LATE][1],
-                     :late_3_id => both_lineups[LATE][2]}
+      daily_lineup = DailyLineup.find_or_create_by_date!(date)
 
-      daily_lineup = DailyLineup.find_or_initialize_by_date(date)
-      daily_lineup.update_attributes(lineup_vals, :without_protection => true) # saves daily_lineup
+      [EARLY, LATE].each do |shift|
+        shift_val = shift == EARLY ? 1 : 2
+        (FIRST_CHOICE..LAST_CHOICE).each do |choice|
+          position = choice + 1
+
+          new_scheduling = Scheduling.where(:daily_lineup_id => daily_lineup.id,
+                                            :restaurant_id => both_lineups[shift][choice]).
+                                      first_or_create!({:shift => shift_val, :position => position},
+                                                       :without_protection => true)
+          #new_scheduling.save!
+        end
+      end
     end
   end
 
