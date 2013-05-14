@@ -231,7 +231,8 @@ class WeeklyMenuData < ScraperBase
                 :address => address,
                 :food_type => food_type,
                 :logo_url => logo_url,
-                :description => description}
+                :description => description,
+                :yelp_id => yelp_id}
 
     restaurant = Restaurant.find_or_initialize_by_waiter_id(waiter_id)
     ScraperBase.log_and_update_record(restaurant, rec_hash)
