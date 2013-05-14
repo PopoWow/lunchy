@@ -8,8 +8,8 @@ development:
   encoding: unicode
   database: lunchy_development
   pool: 5
-  username: kyle
-  password:
+  username: postgres
+  password: secret
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -19,13 +19,13 @@ test:
   encoding: unicode
   database: lunchy_test
   pool: 5
-  username: kyle
-  password:
+  username: postgres
+  password: secret
 
 production:
   adapter: postgresql
   encoding: unicode
   database: lunchy_production
   pool: 5
-  username: kyle
-  password:
+  username: postgres
+  password: secret
