@@ -1,14 +1,12 @@
-- cache ['lineup', date, restaurant] do
+- cache ['lineup', restaurant] do
   %tr
     - row_span = if restaurant.description.empty? then 1 else 2 end
     %td{:width => "100", :rowspan => row_span}
       %img{:src => "http://www.waiter.com" + restaurant.logo_url, :alt => restaurant.name}
     %td
-      %b= "%s %d:" % [(scheduling.shift == 1 ? "Early" : "Late"), scheduling.position]
       %a{:href => restaurant_path(restaurant.id)}= restaurant.name
+      = "(#{restaurant.food_type})"
+
   -if not restaurant.description.empty?
     %tr
       %td= restaurant.description
-
-  %tr
-    %td{:colspan => 2}

@@ -19,7 +19,10 @@
       %b Date:
       =@lineup.date
   - @lineup.schedulings.includes(:restaurant).each do |scheduling|
-    =render :partial => "lineup_item",
-            :locals => { :date => @lineup.date,
-                         :scheduling => scheduling,
-                         :restaurant => scheduling.restaurant }
+    %tr
+      %td
+        %b= "%s %d:" % [(scheduling.shift == 1 ? "Early" : "Late"), scheduling.position]
+    = render :partial => "lineup_item",
+             :locals => { :date => @lineup.date,
+                          :scheduling => scheduling,
+                          :restaurant => scheduling.restaurant }
