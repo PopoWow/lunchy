@@ -2,20 +2,13 @@ class DishesController < ApplicationController
   # GET /dishes
   # GET /dishes.json
   def index
-    @dishes = Dish.all
+    # eager loading seems to get blown away by subsequently sorting courses
+    # add a scope?  new has_many positioned_courses?
+    #@restaurant = Restaurant.includes(:courses => :dishes).find(params[:id])
+    @restaurant = Restaurant.find(params[:restaurant_id])
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @dishes }
-    end
-  end
-
-  def index_for_restaurant
-    @dishes = Restaurant.find(params[:id]).dishes
-
-    respond_to do |format|
-      format.html { render :index }
-      format.xml  { render xml: @dishes }
       format.json { render json: @dishes }
     end
   end

@@ -13,9 +13,6 @@ class RestaurantsController < ApplicationController
   # GET /restaurants/1
   # GET /restaurants/1.json
   def show
-    # eager loading seems to get blown away by subsequently sorting courses
-    # add a scope?  new has_many positioned_courses?
-    #@restaurant = Restaurant.includes(:courses => :dishes).find(params[:id])
     @restaurant = Restaurant.find(params[:id])
 
     respond_to do |format|

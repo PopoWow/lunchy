@@ -1,29 +1,22 @@
-%h1 Listing dishes
+%a{:href => root_path}home
+
+%p
+  %h2= @restaurant.name
+  %h4= @restaurant.description
 
 %table
-  %tr
-    %th Waiter
-    %th Name
-    %th Description
-    %th Price
-    %th Restaurant
-    %th Course
-    %th
-    %th
-    %th
+  - @restaurant.active_courses.includes(:active_dishes).each do |course|
+    - cache ['restaurant', course] do
+      %tr
+        %td
+          %h3= "#{course.name} pos:#{course.position}"
+      = render :partial => "desc_row", :locals => { :item => course }
 
-  - @dishes.each do |dish|
-    %tr
-      %td= dish.waiter_id
-      %td= dish.name
-      %td= dish.description
-      %td= dish.price
-      %td= dish.restaurant
-      %td= dish.course
-      %td= link_to 'Show', dish
-      %td= link_to 'Edit', edit_dish_path(dish)
-      %td= link_to 'Destroy', dish, :method => :delete, :data => { :confirm => 'Are you sure?' }
-
-%br
-
-= link_to 'New Dish', new_dish_path
+    - course.active_dishes.each do |dish|
+      - cache ['restaurant', dish] do
+        %tr
+          %td
+            %h5
+              %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
+          %td= dish.price
+        = render :partial => "desc_row", :locals => { :item => dish }
