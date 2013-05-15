@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130513212400) do
+ActiveRecord::Schema.define(:version => 20130514043105) do
 
   create_table "courses", :force => true do |t|
     t.integer  "waiter_id"
@@ -77,6 +77,20 @@ ActiveRecord::Schema.define(:version => 20130513212400) do
     t.text     "description"
     t.string   "yelp_id"
   end
+
+  create_table "reviews", :force => true do |t|
+    t.string   "title"
+    t.text     "content"
+    t.boolean  "expurgate",       :default => false
+    t.integer  "reviewable_id"
+    t.string   "reviewable_type"
+    t.integer  "user_id"
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+  end
+
+  add_index "reviews", ["reviewable_id"], :name => "index_reviews_on_reviewable_id"
+  add_index "reviews", ["user_id"], :name => "index_reviews_on_user_id"
 
   create_table "schedulings", :id => false, :force => true do |t|
     t.integer  "daily_lineup_id"

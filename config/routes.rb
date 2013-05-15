@@ -21,14 +21,31 @@ Lunchy::Application.routes.draw do
 
   get "lineups/:id" => "daily_lineups#show", :as => "lineups", :constraints => {:id => /[0-9]+|today/}
 
-  resources :dishes, :only => [:show], :constraints => {:id => /[0-9]+/}
+
 
   constraints(:id => /[0-9]+/) do
-    resources :restaurants, :only => [:show] do
+    resources :restaurants do
       #resources :dishes, :only => [:index]
-      get "dishes" => "dishes#index_for_restaurant", :on => :member, :as => "dishes_for"
+      #get "dishes" => "dishes#index_for_restaurant", :on => :member, :as => "dishes_for"
+      resources :courses, :only => :index
+      resources :dishes, :only => :index
+      resources :reviews, :only => [:index, :new, :create]
     end
+
+    resources :courses, :only => [:show, :update, :edit, :destroy] do
+      resources :dishes, :only => :index
+    end
+
+    resources :dishes, :only => [:show, :update, :edit, :destroy] do
+      resources :reviews, :only => [:index, :new, :create]
+    end
+
+    # when manipulating an existing review, only have route
+    # for that review instead of nesting for irrelevant
+    # reviewable objects (restaurant/dish)
+    resources :reviews, :only => [:show, :update, :edit, :destroy]
   end
+
 
   #get "home/index"
 

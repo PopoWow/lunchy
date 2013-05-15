@@ -1,0 +1,19 @@
+%p#notice= notice
+
+%p
+  %b Title:
+  = @review.title
+%p
+  %b Content:
+  = @review.content
+%p
+  %b Expurgate:
+  = @review.expurgate
+%p
+  %b Reviewable:
+  = @review.reviewable
+%p
+  %b User:
+  = current_user.nickname
+
+= link_to 'Edit', edit_review_path(@review)

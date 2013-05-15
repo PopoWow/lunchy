@@ -1,5 +1,9 @@
 class Dish < ActiveRecord::Base
   belongs_to :course
+
+  # polymorphic thus :as.  Not inversable
+  has_many :reviews, :as => :reviewable
+
   attr_protected
 
   scope :active, where(:active => true).order("position")

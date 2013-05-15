@@ -1,5 +1,8 @@
 class User < ActiveRecord::Base
   authenticates_with_sorcery!
+
+  has_many :reviews, :inverse_of => :user
+
   # attr_accessible :title, :body
 
   # from railscast
