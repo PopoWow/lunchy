@@ -1,27 +1,21 @@
 Lunchy::Application.routes.draw do
 
 # config/routes.rb
-  resources :password_resets
-
-  #get "password_resets/create"
-  #get "password_resets/edit"
-  #get "password_resets/update"
+  resources :password_resets, :only => [:new, :create, :edit, :update]
 
   get "logout" => "sessions#destroy", :as => "logout"
   get "login" =>"sessions#new", :as => "login"
   get "signup" => "users#new", :as => "signup"
 
-  resources :users do
+  resources :users, :only => [:new, :create] do
     member do
       get :activate
     end
   end
 
-  resources :sessions
+  resources :sessions, :only => [:new, :create, :destroy]
 
   get "lineups/:id" => "daily_lineups#show", :as => "lineups", :constraints => {:id => /[0-9]+|today/}
-
-
 
   constraints(:id => /[0-9]+/) do
     resources :restaurants do
@@ -44,6 +38,7 @@ Lunchy::Application.routes.draw do
     # for that review instead of nesting for irrelevant
     # reviewable objects (restaurant/dish)
     resources :reviews, :only => [:show, :update, :edit, :destroy]
+    get "reviews" => "reviews#index_all"
   end
 
 
