@@ -9,5 +9,20 @@
   .field
     = f.label :name
     = f.text_field :name
+  .field
+    = f.label :description
+    = f.text_area :description
+  .field
+    = f.label :address
+    = f.text_field :address
+  .field
+    = f.label :food_type
+    = f.text_field :food_type
+  .field
+    = f.label :logo_url
+    = f.text_field :logo_url
+  .field
+    = f.label :yelp_id
+    = f.text_field :yelp_id
   .actions
     = f.submit 'Save'

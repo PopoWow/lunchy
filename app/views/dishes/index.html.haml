@@ -5,7 +5,7 @@
   %h4= @restaurant.description
 
 %table
-  - @restaurant.active_courses.includes(:active_dishes).each do |course|
+  - @restaurant.active_courses.includes(:active_dishes => :reviews).each do |course|
     - cache ['restaurant', course] do
       %tr
         %td
@@ -20,3 +20,12 @@
               %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
           %td= dish.price
         = render :partial => "desc_row", :locals => { :item => dish }
+        %tr
+          %td
+            - if dish.reviews.length.zero?
+              = pluralize(0, 'Review')
+            - else
+              = link_to pluralize(dish.reviews.length, 'Review'), dish_reviews_path(dish)
+
+
+

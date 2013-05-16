@@ -6,7 +6,7 @@ class Dish < ActiveRecord::Base
 
   attr_protected
 
-  scope :active, where(:active => true).order("position")
+  #scope :active, where(:active => true).order("position")
 
   def restaurant
     # helper to add easy access to owning restaurant from this model.

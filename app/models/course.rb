@@ -8,7 +8,7 @@ class Course < ActiveRecord::Base
   has_many :active_dishes, :class_name => 'Dish',
            :conditions => ['active = ?', true], :order => :position
 
-  belongs_to :restaurant
+  belongs_to :restaurant, :inverse_of => :courses
 
   attr_protected
 

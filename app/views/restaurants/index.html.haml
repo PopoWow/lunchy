@@ -3,6 +3,7 @@
 %table
   %tr
     %th Name
+    %th Reviews
     %th
     %th
     %th
@@ -10,6 +11,7 @@
   - @restaurants.each do |restaurant|
     %tr
       %td= restaurant.name
+      %td= restaurant.reviews.count
       %td= link_to 'Show', restaurant
       %td= link_to 'Edit', edit_restaurant_path(restaurant)
       %td= link_to 'Destroy', restaurant, :method => :delete, :data => { :confirm => 'Are you sure?' }

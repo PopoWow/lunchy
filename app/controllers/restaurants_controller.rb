@@ -2,7 +2,7 @@ class RestaurantsController < ApplicationController
   # GET /restaurants
   # GET /restaurants.json
   def index
-    @restaurants = Restaurant.all
+    @restaurants = Restaurant.includes(:reviews).all
 
     respond_to do |format|
       format.html # index.html.erb

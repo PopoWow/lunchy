@@ -15,3 +15,7 @@ back to
 %p
   %b Price:
   = @dish.price
+
+= link_to 'Reviews', dish_reviews_path(@dish)
+\|
+= link_to 'Write Review', new_dish_review_path(@dish)

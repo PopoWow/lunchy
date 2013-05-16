@@ -1,21 +1,18 @@
-%h1 Listing reviews
+%h1
+  = "Reviews for #{@review_target.name}"
 
-= debug @reviews
 %table
   %tr
     %th Title
     %th Content
-    %th Expurgate
-    %th Reviewable
     %th
     %th
     %th
 
-  - @reviews.each do |review|
+  - @review_target.reviews.each do |review|
     %tr
       %td= review.title
       %td= review.content
-      %td= "#{review.reviewable.id}:#{review.reviewable.name}"
       %td= link_to 'Show', review
       %td= link_to 'Edit', edit_review_path(review)
       %td= link_to 'Destroy', review, :method => :delete, :data => { :confirm => 'Are you sure?' }
