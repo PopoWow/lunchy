@@ -18,7 +18,7 @@
     %td{:colspan => 2}
       %b Date:
       =@lineup.date
-  - @lineup.schedulings.includes(:restaurant).each do |scheduling|
+  - @lineup.schedulings.includes(:restaurant => :reviews).each do |scheduling|
     %tr
       %td
         %b= "%s %d:" % [(scheduling.shift == 1 ? "Early" : "Late"), scheduling.position]
