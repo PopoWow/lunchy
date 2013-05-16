@@ -13,7 +13,10 @@ class RestaurantsController < ApplicationController
   # GET /restaurants/1
   # GET /restaurants/1.json
   def show
-    @restaurant = Restaurant.find(params[:id])
+    @restaurant = Restaurant.includes(:reviews).find(params[:id])
+    if params[:src]
+      @lineup = Restaurant.find(params[:src])
+    end
 
     respond_to do |format|
       format.html # show.html.erb

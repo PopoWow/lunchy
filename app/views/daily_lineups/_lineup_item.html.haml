@@ -4,7 +4,7 @@
     %td{:width => "100", :rowspan => row_span}
       %img{:src => "http://www.waiter.com" + restaurant.logo_url, :alt => restaurant.name}
     %td
-      %a{:href => restaurant_path(restaurant.id)}= restaurant.name
+      = link_to restaurant.name, restaurant_path(restaurant.id, :src => lineup)
       = "(#{restaurant.food_type})"
 
   - if not restaurant.description.empty?

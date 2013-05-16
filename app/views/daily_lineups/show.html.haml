@@ -23,6 +23,6 @@
       %td
         %b= "%s %d:" % [(scheduling.shift == 1 ? "Early" : "Late"), scheduling.position]
     = render :partial => "lineup_item",
-             :locals => { :date => @lineup.date,
+             :locals => { :lineup => @lineup,
                           :scheduling => scheduling,
                           :restaurant => scheduling.restaurant }

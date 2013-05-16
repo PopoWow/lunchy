@@ -1,16 +1,42 @@
-%p#notice= notice
+- if @lineup
+  = link_to 'Back', lineups_path(@lineup)
+- else
+  = link_to 'Home', root_path
+\|
+= link_to 'Dishes', restaurant_dishes_path(@restaurant)
+\|
+= link_to 'Write Review', new_restaurant_review_path(@restaurant)
+
+%p
+  %img{:src => "http://www.waiter.com" + @restaurant.logo_url, :alt => "img"}
 
 %p
   %b Name:
   = @restaurant.name
 
-= link_to 'Edit', edit_restaurant_path(@restaurant)
-\|
-= link_to 'Back', restaurants_path
-%br
-= link_to 'Dishes', restaurant_dishes_path(@restaurant)
-%br
-= link_to 'Reviews', restaurant_reviews_path(@restaurant)
-\|
-= link_to 'Write Review', new_restaurant_review_path(@restaurant)
+%p
+  %b Description:
+  = @restaurant.description
+
+%p
+  %b Address:
+  = @restaurant.address
+
+%p
+  %b Food type:
+  = @restaurant.food_type
+
+%p
+  %b Yelp Id:
+  = @restaurant.yelp_id
+
+%h3 Reviews
+- @restaurant.reviews.each_with_index do |review, index|
+  %table
+    %tr
+      %td= "#{index+1}"
+    %tr
+      %td= review.title
+    %tr
+      %td= review.content
 
