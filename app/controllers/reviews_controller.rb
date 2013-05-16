@@ -11,6 +11,15 @@ class ReviewsController < ApplicationController
     end
   end
 
+  def index_all
+    @reviews =  Review.includes(:reviewable, :user)
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.json { render json: @reviews }
+    end
+  end
+
   # GET /reviews/1
   # GET /reviews/1.json
   def show
@@ -25,7 +34,7 @@ class ReviewsController < ApplicationController
   # GET /reviews/new
   # GET /reviews/new.json
   def new
-    debugger
+    #debugger
     @review = Review.new
 
     respond_to do |format|
@@ -42,7 +51,7 @@ class ReviewsController < ApplicationController
   # POST /reviews
   # POST /reviews.json
   def create
-    debugger
+    #debugger
 
     @review = Review.new(params[:review])
     @review.reviewable = @review_target
