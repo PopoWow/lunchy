@@ -15,4 +15,8 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :email
   validates_presence_of :nickname
   validates_uniqueness_of :nickname
+  
+  def resend
+    send_activation_needed_email!
+  end
 end
