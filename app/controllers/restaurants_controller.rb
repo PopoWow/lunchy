@@ -1,4 +1,6 @@
 class RestaurantsController < ApplicationController
+  before_filter :init_history, :only => :show
+
   # GET /restaurants
   # GET /restaurants.json
   def index
@@ -14,9 +16,6 @@ class RestaurantsController < ApplicationController
   # GET /restaurants/1.json
   def show
     @restaurant = Restaurant.includes(:reviews).find(params[:id])
-    if params[:src]
-      @lineup = Restaurant.find(params[:src])
-    end
 
     respond_to do |format|
       format.html # show.html.erb

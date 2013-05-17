@@ -1,3 +1,11 @@
+- if @lineup
+  = link_to "lineup for #{@lineup.date}", lineups_path(@lineup)
+- else
+  = link_to 'home', root_path
+←
+= link_to @review.reviewable.name,  polymorphic_path(@review.reviewable)
+←
+
 %p
   %b Title:
   = @review.title

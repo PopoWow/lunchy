@@ -1,8 +1,14 @@
-
-= link_to "back to #{@dish.restaurant.name}", restaurant_path(@dish.restaurant)
-\|
-= link_to 'home', root_path
+- if @lineup
+  = link_to "lineup for #{@lineup.date}", lineups_path(@lineup)
+- else
+  = link_to 'home', root_path
+←
+= link_to @dish.restaurant.name, restaurant_path(@dish.restaurant)
+←
+= link_to 'dishes', restaurant_dishes_path(@dish.restaurant)
+←
 %br
+= link_to 'write review', new_dish_review_path(@dish)
 
 %p
   %b Waiter:
@@ -17,3 +23,4 @@
   %b Price:
   = @dish.price
 
+- @dish.reviews

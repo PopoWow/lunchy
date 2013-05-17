@@ -1,4 +1,6 @@
 class DishesController < ApplicationController
+  before_filter :init_history, :only => [:index, :show]
+
   # GET /dishes
   # GET /dishes.json
   def index

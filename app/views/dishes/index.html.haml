@@ -1,4 +1,11 @@
-%a{:href => root_path}home
+- if @lineup
+  = link_to "lineup for #{@lineup.date}", lineups_path(@lineup)
+- else
+  = link_to 'home', root_path
+←
+= link_to @restaurant.name, restaurant_path(@restaurant)
+←
+%br
 
 %p
   %h2= @restaurant.name

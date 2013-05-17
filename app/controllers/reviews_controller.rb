@@ -1,10 +1,10 @@
 class ReviewsController < ApplicationController
   before_filter :set_review_target, :only => [:index, :new, :create]
+  before_filter :init_history
 
   # GET /reviews
   # GET /reviews.json
   def index
-
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @reviews }
@@ -23,7 +23,7 @@ class ReviewsController < ApplicationController
   # GET /reviews/1
   # GET /reviews/1.json
   def show
-    @review = Review.find(params[:id])
+    @review = Review.includes(:reviewable).find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
