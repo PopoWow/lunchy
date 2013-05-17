@@ -2,8 +2,7 @@ class DailyLineupsController < ApplicationController
   # GET /daily_lineups
   # GET /daily_lineups.json
   def index
-    @daily_lineups = DailyLineup.includes(:early_1, :early_2, :early_3,
-                                          :late_1,  :late_2,  :late_3)
+    @daily_lineups = DailyLineup.includes(:restaurants)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -33,7 +32,10 @@ class DailyLineupsController < ApplicationController
     # for the rest of these, try using relations so we can lazy load them
     # and take advantage of fragment caching.
 
-    if not @lineup
+    if @lineup
+      session[:lineup_id] = @lineup.id
+    else
+      session[:lineup_id] = nil
       # there was no lineup found.  Either because the ID is bad or there just isn't
       # information available for "today".  Show error page witha link back to the
       # last valid lineup in case user want to review something.

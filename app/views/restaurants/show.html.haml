@@ -1,11 +1,12 @@
-- if @lineup
-  = link_to 'Back', lineups_path(@lineup)
+- if session[:lineup_id]
+  = link_to "back", lineups_path(session[:lineup_id])
 - else
-  = link_to 'Home', root_path
+  = link_to 'today', root_path
+%br
+
+= link_to 'dishes', restaurant_dishes_path(@restaurant)
 \|
-= link_to 'Dishes', restaurant_dishes_path(@restaurant)
-\|
-= link_to 'Write Review', new_restaurant_review_path(@restaurant)
+= link_to 'write review', new_restaurant_review_path(@restaurant)
 
 %p
   %img{:src => "http://www.waiter.com" + @restaurant.logo_url, :alt => "img"}

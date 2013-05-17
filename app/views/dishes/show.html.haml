@@ -1,7 +1,8 @@
-%a{:href => root_path}home
+
+= link_to "back to #{@dish.restaurant.name}", restaurant_path(@dish.restaurant)
+\|
+= link_to 'home', root_path
 %br
-back to
-%a{:href => restaurant_path(@dish.restaurant)}= @dish.restaurant.name
 
 %p
   %b Waiter:
@@ -16,6 +17,3 @@ back to
   %b Price:
   = @dish.price
 
-= link_to 'Reviews', dish_reviews_path(@dish)
-\|
-= link_to 'Write Review', new_dish_review_path(@dish)
