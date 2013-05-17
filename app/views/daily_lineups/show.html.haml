@@ -1,7 +1,7 @@
 - cache ['navbar', @lineup] do
   - previous_rec = @previous.first
   - if previous_rec
-    %a{:href => lineups_path(previous_rec)}back
+    %a{:href => lineups_path(previous_rec)}previous
     |
   -else
     back
