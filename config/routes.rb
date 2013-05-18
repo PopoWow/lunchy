@@ -7,7 +7,7 @@ Lunchy::Application.routes.draw do
   get "login" =>"sessions#new", :as => "login"
   get "signup" => "users#new", :as => "signup"
 
-  resources :users, :only => [:new, :create] do
+  resources :users, :only => [:new, :create, :edit, :update] do
     member do
       get :activate
     end

@@ -14,4 +14,9 @@ class ApplicationController < ActionController::Base
       @history << ['home', root_path]
     end
   end
+
+  def add_to_history(label, path)
+    @history << [label, path]
+  end
+
 end

@@ -1,10 +1,4 @@
-- if @lineup
-  = link_to "lineup for #{@lineup.date}", lineups_path(session[:lineup_id])
-- else
-  = link_to 'today', root_path
-←
-%br
-
+→
 = link_to 'dishes', restaurant_dishes_path(@restaurant)
 \|
 = link_to 'write review', new_restaurant_review_path(@restaurant)

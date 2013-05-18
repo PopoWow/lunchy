@@ -8,6 +8,8 @@ class DishesController < ApplicationController
     # add a scope?  new has_many positioned_courses?
     #@restaurant = Restaurant.includes(:courses => :dishes).find(params[:id])
     @restaurant = Restaurant.find(params[:restaurant_id])
+    add_to_history(@restaurant.name, restaurant_path(@restaurant))
+
 
     respond_to do |format|
       format.html # index.html.erb
@@ -19,6 +21,8 @@ class DishesController < ApplicationController
   # GET /dishes/1.json
   def show
     @dish = Dish.find(params[:id])
+    add_to_history(@dish.restaurant.name, restaurant_path(@dish.restaurant))
+    add_to_history('dishes', restaurant_dishes_path(@dish.restaurant))
 
     respond_to do |format|
       format.html # show.html.erb

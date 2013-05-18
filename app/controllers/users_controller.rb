@@ -14,6 +14,15 @@ class UsersController < ApplicationController
     end
   end
 
+  def edit
+    @user = User.find(params[:id])
+  end
+
+  def update
+    @user = User.find(params[:id])
+    @user.update_aatributes(params[:user])
+  end
+
   def activate
     #debugger
     @user = User.load_from_activation_token(params[:id])

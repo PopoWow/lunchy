@@ -19,6 +19,9 @@ class DailyLineupsController < ApplicationController
     # choices!).  But also, because we're caching each restaurant
     # as a fragment so eager loading it here would be actually
     # wasteful.
+
+    @hide_history_bar = true
+
     if params["id"] == "today"
       @lineup = DailyLineup.where("date >= :today", {:today => Date.today}).order(:date).first
     else

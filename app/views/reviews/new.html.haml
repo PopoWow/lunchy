@@ -1,11 +1,4 @@
-- if @lineup
-  = link_to "lineup for #{@lineup.date}", lineups_path(@lineup)
-- else
-  = link_to 'home', root_path
-←
-= link_to @review_target.name,  polymorphic_path(@review_target)
-←
-%br
+- # reviews/new
 
 %h3= "New review for #{@review_target.name}"
 

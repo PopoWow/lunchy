@@ -5,6 +5,7 @@ class ReviewsController < ApplicationController
   # GET /reviews
   # GET /reviews.json
   def index
+
     respond_to do |format|
       format.html # index.html.erb
       format.json { render json: @reviews }
@@ -34,7 +35,8 @@ class ReviewsController < ApplicationController
   # GET /reviews/new
   # GET /reviews/new.json
   def new
-    #debugger
+    set_history
+
     @review = Review.new
 
     respond_to do |format|
@@ -45,6 +47,7 @@ class ReviewsController < ApplicationController
 
   # GET /reviews/1/edit
   def edit
+    set_history
     @review = Review.find(params[:id])
   end
 
@@ -100,9 +103,19 @@ class ReviewsController < ApplicationController
     if /restaurant/ =~ request.path and params[:restaurant_id]
       @review_target = Restaurant.find(params[:restaurant_id])
     elsif /dish/ =~ request.path and params[:dish_id]
-      @review_target = Dish.find(params[:dish_id])
+      @review_target = Dish.includes(:restaurant).find(params[:dish_id])
     end
 
     @review_target || not_found
+  end
+
+  def set_history
+    raise ArgumentError unless @review_target
+
+    if @review_target.respond_to? :restaurant
+      add_to_history(@review_target.restaurant.name, restaurant_path(@review_target.restaurant))
+      add_to_history('dishes', restaurant_dishes_path(@review_target.restaurant))
+    end
+    add_to_history(@review_target.name, polymorphic_path(@review_target))
   end
 end

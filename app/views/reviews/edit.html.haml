@@ -1,7 +1,5 @@
-%h1 Editing review
+- # reviews/edit
+
+%h3= "Edit review for #{@review_target.name}"
 
 = render 'form'
-
-= link_to 'Show', @review
-\|
-= link_to 'Back', restaurant_path(@review.reviewable)

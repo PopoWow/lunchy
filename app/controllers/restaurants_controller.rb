@@ -23,20 +23,26 @@ class RestaurantsController < ApplicationController
     end
   end
 
+=begin
   # GET /restaurants/new
   # GET /restaurants/new.json
   def new
     @restaurant = Restaurant.new
+
+    add_to_history(@restaurant.name, restaurant_path(@restaurant))
+
 
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @restaurant }
     end
   end
+=end
 
   # GET /restaurants/1/edit
   def edit
     @restaurant = Restaurant.find(params[:id])
+    add_to_history(@restaurant.name, restaurant_path(@restaurant))
   end
 
   # POST /restaurants
