@@ -56,9 +56,8 @@ class ReviewsController < ApplicationController
   def create
     #debugger
 
-    @review = Review.new(params[:review])
+    @review = current_user.reviews.new(params[:review])
     @review.reviewable = @review_target
-    @review.user = current_user
 
     respond_to do |format|
       if @review.save
