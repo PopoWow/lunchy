@@ -24,6 +24,7 @@ Lunchy::Application.routes.draw do
       resources :courses, :only => :index
       resources :dishes, :only => :index
       resources :reviews, :only => [:index, :new, :create]
+      post "rate" => "restaurants#rate", :as => "rate"
     end
 
     resources :courses, :only => [:show, :update, :edit, :destroy] do
@@ -32,6 +33,7 @@ Lunchy::Application.routes.draw do
 
     resources :dishes, :only => [:show, :update, :edit, :destroy] do
       resources :reviews, :only => [:index, :new, :create]
+      post "rate/:value" => "dishes#rate", :as => "rate"
     end
 
     # when manipulating an existing review, only have route

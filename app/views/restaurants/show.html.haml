@@ -3,6 +3,13 @@
 \|
 = link_to 'write review', new_restaurant_review_path(@restaurant)
 
+= select_tag "rating", options_for_select(1..5, 0),
+  :prompt => "Rate me",
+  :'data-method' => 'post',
+  :'data-remote' => 'true',
+  :'data-url' => restaurant_rate_path(@restaurant.id),
+  :'data-type' => 'json'
+
 %p
   %img{:src => "http://www.waiter.com" + @restaurant.logo_url, :alt => "img"}
 

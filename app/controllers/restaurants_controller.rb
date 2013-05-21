@@ -88,4 +88,28 @@ class RestaurantsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  # POST /restaurant/1/rate
+  def rate
+    query = Rating.where(:user_id => current_user,
+                         :ratable_id => params[:restaurant_id],
+                         :ratable_type => "Restaurant")
+    rating = query.first_or_initialize
+
+    # check and see if the item is changed or new.
+    response = {}
+    if query.exists?
+      response[:text] = "Rating changed from #{rating.value} to #{params[:rating]}"
+    else
+      response[:text] = "Thank you for rating this restaurant!"
+    end
+
+    rating.value = params[:rating]
+    rating.save!
+
+    respond_to do |format|
+      format.json { render json: response }
+    end
+  end
+
 end

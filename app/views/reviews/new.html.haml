@@ -2,4 +2,5 @@
 
 %h3= "New review for #{@review_target.name}"
 
+= select_tag "rating", options_for_select(1..5)
 = render 'form'
