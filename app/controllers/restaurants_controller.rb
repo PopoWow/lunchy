@@ -17,6 +17,8 @@ class RestaurantsController < ApplicationController
   def show
     @restaurant = Restaurant.includes(:reviews).find(params[:id])
 
+    debugger
+
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @restaurant }
@@ -107,9 +109,8 @@ class RestaurantsController < ApplicationController
     rating.value = params[:rating]
     rating.save!
 
-    respond_to do |format|
-      format.json { render json: response }
-    end
+    @info = response[:text]
+    render :rate
   end
 
 end

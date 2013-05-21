@@ -1,6 +1,7 @@
 class Rating < ActiveRecord::Base
   belongs_to :ratable, :polymorphic => true, :touch => true
   belongs_to :user, :inverse_of => :ratings
+  scope :for_user, lambda {|user| where("user_id = ?", user.id) }
 
   attr_accessible :value
 

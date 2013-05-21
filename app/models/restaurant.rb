@@ -14,6 +14,11 @@ class Restaurant < ActiveRecord::Base
   # polymorphic thus :as.  Not inversable
   has_many :reviews, :as => :reviewable
 
+  # association to rating
+  has_many :ratings, :as => :ratable
+  #scope :rating, lambda {|user| ratings.where("user_id = ?", user.id) }
+
+
   #scope :active_courses_dishes_reviews, courses.where("active = ?", true).order(:position).includes(:dishes => :reviews)
 
   # exper.
