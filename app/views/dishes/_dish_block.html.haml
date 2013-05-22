@@ -1,6 +1,6 @@
 - # any new ratings/review for this dish will expire the cache
-- cache ['restaurant', dish] do
-  #dish-content{:id => dish.id}
+- cache ['index', dish] do
+  #dish_block{:id => dish.id}
     %h5
       %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
       %span= dish.price

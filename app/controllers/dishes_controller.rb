@@ -4,12 +4,26 @@ class DishesController < ApplicationController
   # GET /dishes
   # GET /dishes.json
   def index
-    # eager loading seems to get blown away by subsequently sorting courses
-    # add a scope?  new has_many positioned_courses?
-    #@restaurant = Restaurant.includes(:courses => :dishes).find(params[:id])
     @restaurant = Restaurant.find(params[:restaurant_id])
     add_to_history(@restaurant.name, restaurant_path(@restaurant))
 
+    dish_ids = []
+    @restaurant.active_courses.includes(:active_dishes).each do |course|
+      dish_ids << course.active_dishes.pluck(:id)
+    end
+    dish_ids.flatten!
+
+    conditions = {:user_id => current_user,
+                  :ratable_type => 'Dish',
+                  :ratable_id => dish_ids}
+    user_ratings = Rating.where(conditions).all
+    @user_ratings = {}
+
+    user_ratings.each do |rating|
+      @user_ratings[rating.ratable_id] = rating.value
+    end
+
+    #debugger
 
     respond_to do |format|
       format.html # index.html.erb
@@ -88,5 +102,25 @@ class DishesController < ApplicationController
       format.html { redirect_to dishes_url }
       format.json { head :no_content }
     end
+  end
+
+  def rate
+    query = Rating.where(:user_id => current_user,
+                         :ratable_id => params[:dish_id],
+                         :ratable_type => "Dish")
+    rating = query.first_or_initialize
+
+    # check and see if the item is changed or new.
+    @response = {:dish => Dish.find(params[:dish_id]) }
+    if query.exists?
+      @response[:notice] = "Rating changed from #{rating.value} to #{params[:rating]}"
+    else
+      @response[:notice] = "Thank you for rating this dish!"
+    end
+
+    rating.value = params[:rating]
+    rating.save!
+
+    render :rate
   end
 end
