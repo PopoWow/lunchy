@@ -2,12 +2,16 @@
   %h2= @restaurant.name
   %h4= @restaurant.description
 
-%table
+%p
   - # foregoing eager loading of review/ratings here in favor of fragment
   - # caching.  Dish frags are evaluated once until something changes
   - # about them... eg: ratings/reviews (via :touch -> :dish)
   - @restaurant.active_courses.includes(:active_dishes).each do |course|
-    = render :partial => 'course_info', :locals => {:course => course}
-    - course.active_dishes.each do |dish|
-      = render :partial => 'dish_block', :locals => {:dish => dish}
-      = render :partial => 'dish_rater', :locals => {:dish => dish}
+    .dishes#course{:id => course.id}
+      %h3= "#{course.name} pos:#{course.position}"
+      = render :partial => "desc_row", :locals => {:item => course}
+      .course-dishes#course_dishes{:id => course.id}
+        - course.active_dishes.each do |dish|
+          .course-dish#course_dish{:id => dish.id}
+            = render :partial => 'dish_block', :locals => {:dish => dish}
+            = render :partial => 'dish_rater', :locals => {:dish => dish}

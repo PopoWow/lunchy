@@ -1,20 +1,18 @@
 - # any new ratings/review for this dish will expire the cache
 - cache ['restaurant', dish] do
-  %tr#dish-block-info{:id => dish.id}
-    %td
-      %h5
-        %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
-    %td= dish.price
-  = render :partial => "desc_row", :locals => { :item => dish }
+  #dish-content{:id => dish.id}
+    %h5
+      %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
+      %span= dish.price
+    = render :partial => "desc_row", :locals => { :item => dish }
 
-  - # Display review/rating info for this dish.
-  %tr#dish-block-feedback{:id => dish.id}
-    %td
-      %div
-        #dish-reviews{:id => dish.id}
-          - if dish.reviews.any?
-            = link_to pluralize(dish.reviews.length, 'Review'), dish_reviews_path(dish)
-          - else
-            = pluralize(0, 'Review')
-        #dish-rating{:id => dish.id}
-          = "Rating: #{dish.star_rating}"
+    - # Display review/rating info for this dish.
+    #dish-feedback{:id => dish.id}
+      %span#dish-reviews{:id => dish.id}
+        - if dish.reviews.any?
+          = link_to pluralize(dish.reviews.length, 'Review'), dish_reviews_path(dish)
+        - else
+          = pluralize(0, 'Review')
+      \|
+      %span#dish-rating{:id => dish.id}
+        = "Rating: #{dish.star_rating}"
