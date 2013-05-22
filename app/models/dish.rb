@@ -3,6 +3,8 @@ class Dish < ActiveRecord::Base
 
   # polymorphic thus :as.  Not inversable
   has_many :reviews, :as => :reviewable
+  has_many :ratings, :as => :ratable
+
   #delegate :restaurant, :to => :course, :allow_nil => true
   has_one :restaurant, :through => :course
   attr_protected
@@ -17,4 +19,12 @@ class Dish < ActiveRecord::Base
     course.restaurant
   end
 =end
+
+  def star_rating
+    # to round to the nearest half star
+    #(val * 2).round / 2.0
+    # is there a way to eager load this?
+
+    ratings.where("value != '0'").average(:value).to_f.round(1)
+  end
 end

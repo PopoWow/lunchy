@@ -1,3 +1,5 @@
+- # Restaurant#show
+
 →
 = link_to 'dishes', restaurant_dishes_path(@restaurant)
 \|
@@ -5,7 +7,8 @@
 
 %div
   %div
-    = select_tag "rating", options_for_select(1..5, @restaurant.ratings.for_user(current_user).first.value),
+    - cur_rating = @restaurant.ratings.for_user(current_user).empty? ? 0 : @restaurant.ratings.for_user(current_user).first.value
+    = select_tag "rating", options_for_select(1..5, cur_rating),
       :prompt => "Rate me",
       :'data-method' => 'post',
       :'data-remote' => 'true',

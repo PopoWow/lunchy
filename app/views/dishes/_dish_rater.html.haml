@@ -1,0 +1,5 @@
+%tr
+  %td
+    #dish-rater{:id => dish.id}
+    My Rating:
+    = select_tag "rating", options_for_select(1..5)

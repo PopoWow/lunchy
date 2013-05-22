@@ -3,35 +3,11 @@
   %h4= @restaurant.description
 
 %table
-  - @restaurant.active_courses.includes(:active_dishes => :reviews).each do |course|
-    - cache ['restaurant', course] do
-      %tr
-        %td
-          %h3= "#{course.name} pos:#{course.position}"
-      = render :partial => "desc_row", :locals => { :item => course }
-
+  - # foregoing eager loading of review/ratings here in favor of fragment
+  - # caching.  Dish frags are evaluated once until something changes
+  - # about them... eg: ratings/reviews (via :touch -> :dish)
+  - @restaurant.active_courses.includes(:active_dishes).each do |course|
+    = render :partial => 'course_info', :locals => {:course => course}
     - course.active_dishes.each do |dish|
-      - cache ['restaurant', dish] do
-        %tr
-          %td
-            %h5
-              %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
-          %td= dish.price
-        = render :partial => "desc_row", :locals => { :item => dish }
-        %tr
-          %td
-            %div
-              %div
-                - if dish.reviews.length.zero?
-                  = pluralize(0, 'Review')
-                - else
-                  = link_to pluralize(dish.reviews.length, 'Review'), dish_reviews_path(dish)
-              %div
-                Rating:
-                4.32
-              %div
-                My Rating:
-                = select_tag "rating", options_for_select(1..5)
-
-
-
+      = render :partial => 'dish_block', :locals => {:dish => dish}
+      = render :partial => 'dish_rater', :locals => {:dish => dish}

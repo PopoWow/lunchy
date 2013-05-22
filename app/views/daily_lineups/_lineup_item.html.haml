@@ -12,5 +12,6 @@
       %td= restaurant.description
   %tr
     %td
-      = pluralize(restaurant.reviews.length, 'Review')
+      = pluralize(restaurant.reviews.length, 'Review') \
+      = "Rating: #{restaurant.star_rating}"
 

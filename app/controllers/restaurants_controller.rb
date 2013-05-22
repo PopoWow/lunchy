@@ -17,8 +17,6 @@ class RestaurantsController < ApplicationController
   def show
     @restaurant = Restaurant.includes(:reviews).find(params[:id])
 
-    debugger
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @restaurant }
