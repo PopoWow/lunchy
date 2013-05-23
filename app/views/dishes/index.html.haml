@@ -6,7 +6,7 @@
   - # foregoing eager loading of review/ratings here in favor of fragment
   - # caching.  Dish frags are evaluated once until something changes
   - # about them... eg: ratings/reviews (via :touch -> :dish)
-  - @restaurant.active_courses.each do |course|
+  - @restaurant.active_courses.includes(:active_dishes).each do |course|
     .dishes#course{:id => course.id}
       %h3= "#{course.name} pos:#{course.position}"
       = render :partial => "desc_row", :locals => {:item => course}

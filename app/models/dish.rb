@@ -27,4 +27,8 @@ class Dish < ActiveRecord::Base
 
     ratings.where("value != '0'").average(:value).to_f.round(1)
   end
+
+  def valid_rating_count
+    ratings.where("value != '0'").count
+  end
 end

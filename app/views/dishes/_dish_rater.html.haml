@@ -1,8 +1,8 @@
 #dish-rater{:id => dish.id}
   My Rating:
-  = select_tag "rating", options_for_select(1..5, get_rating(dish.id)),
-    :prompt => "Rate me",
-    :'data-method' => 'post',
-    :'data-remote' => 'true',
-    :'data-url' => dish_rate_path(dish)
+  - range = get_rating(dish.id) ? (0..5) : (1..5)
+  - options = {:'data-method' => 'post', :'data-remote' => 'true', :'data-url' => dish_rate_path(dish)}
+  - if not get_rating(dish.id) then options[:prompt] = "Rate me" end
+  = select_tag "rating", options_for_select(range, get_rating(dish.id)), options
+
   %span.dish-rater-flash#dish_rater_flash{:id => dish.id}
