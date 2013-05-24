@@ -3,12 +3,17 @@ class DishesController < ApplicationController
 
   before_filter :init_history, :only => [:index, :show]
 
-  # GET /dishes
-  # GET /dishes.json
+  # GET /restaurants/:id/dishes
+  # GET /restaurants/:id/dishes.json
   def index
     @restaurant = Restaurant.find(params[:restaurant_id])
     add_to_history(@restaurant.name, restaurant_path(@restaurant))
 
+    # Get all the ratings for this restaurant.  Calculates
+    # the dish_ids from all courses and then does a query
+    # using that list.  Stores the rating info in a list
+    # that is referred to by the view to populate the
+    # initial state of the rating select_tags
     dish_ids = []
     @restaurant.active_courses.includes(:active_dishes).each do |course|
       # tried using active_dishes.pluck(:id) but I didn't like how that
@@ -25,10 +30,11 @@ class DishesController < ApplicationController
     @user_ratings = {}
 
     user_ratings.each do |rating|
-      @user_ratings[rating.ratable_id] = rating.value
+      @user_ratings[rating.ratable_id] = [rating.id, rating.value]
     end
 
-    #debugger
+    # @user_ratings is not referrable to get rating state for
+    # specific dishes for current_user.
 
     respond_to do |format|
       format.html # index.html.erb
