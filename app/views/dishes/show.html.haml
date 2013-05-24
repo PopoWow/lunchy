@@ -16,4 +16,4 @@
   %b Price:
   = @dish.price
 
-- @dish.reviews
+= render :partial => 'show_feedback', :locals => {:item => @dish}
