@@ -2,8 +2,11 @@ class User < ActiveRecord::Base
   authenticates_with_sorcery!
 
   has_many :reviews, :inverse_of => :user
-
-  # attr_accessible :title, :body
+  has_many :ratings, :inverse_of => :user
+  has_many :reviewed_dishes, :through => :reviews, :source => :reviewable, :source_type => 'Dish'
+  has_many :rated_dishes, :through => :ratings, :source => :ratable, :source_type => 'Dish'
+  has_many :reviewed_restaurants, :through => :reviews, :source => :reviewable, :source_type => 'Restaurant'
+  has_many :rated_restaurants, :through => :ratings, :source => :ratable, :source_type => 'Restaurant'
 
   # from railscast
   attr_accessible :nickname, :email, :password, :password_confirmation
