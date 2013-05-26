@@ -21,9 +21,9 @@ class Restaurant < ActiveRecord::Base
   # association to rating
   has_many :ratings, :as => :ratable
 
+  attr_protected
+
   #scope :rating, lambda {|user| ratings.where("user_id = ?", user.id) }
-
-
   #scope :active_courses_dishes_reviews, courses.where("active = ?", true).order(:position).includes(:dishes => :reviews)
 
   # exper.
@@ -37,5 +37,12 @@ class Restaurant < ActiveRecord::Base
     ratings.where("value != '0'").average(:value).to_f.round(1)
   end
 
-  attr_protected
+  def feedbacks
+    Review.select("*").
+           joins(%Q[FULL OUTER JOIN ratings ON reviews.user_id = ratings.user_id
+                    INNER JOIN users ON (users.id = reviews.user_id OR users.id = ratings.user_id)]).
+           where([%Q[(reviews.reviewable_id = ? AND reviews.reviewable_type = 'Restaurant') OR
+                     (ratings.ratable_id = ? AND ratings.ratable_type = 'Restaurant')],
+                  id, id])
+  end
 end

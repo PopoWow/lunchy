@@ -35,4 +35,12 @@ class Dish < ActiveRecord::Base
   def valid_rating_count
     ratings.where("value != '0'").count
   end
+
+  def feedbacks
+    Review.select("*").
+           joins(%Q[FULL OUTER JOIN ratings ON reviews.user_id = ratings.user_id
+                    INNER JOIN users ON (users.id = reviews.user_id OR users.id = ratings.user_id)]).
+           where(["(reviews.reviewable_id = ? AND reviews.reviewable_type = 'Dish') OR (ratings.ratable_id = ? AND ratings.ratable_type = 'Dish')",
+                  id, id])
+  end
 end

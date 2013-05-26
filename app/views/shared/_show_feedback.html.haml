@@ -1,0 +1,17 @@
+%p.feedback-list
+  %h3
+    Feedback:
+  - cache ['show-feedback', feedbackable] do
+    - if feedbackable.feedbacks.any?
+      - feedbackable.feedbacks.each_with_index do |info, index|
+        .feedback-item#feedback_item{:id => index}
+          %h5
+            #{index+1}:
+            %span= "By #{info.attributes["nickname"]}"
+            - if info.attributes["value"]
+              %span= "Rating: #{info.attributes["value"]}"
+          %h4
+            %div= info.attributes["title"]
+          %div= info.attributes["content"]
+    - else
+      No feedback yet!

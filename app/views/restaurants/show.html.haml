@@ -39,13 +39,4 @@
   %b Yelp Id:
   = @restaurant.yelp_id
 
-%h3 Reviews
-- @restaurant.reviews.each_with_index do |review, index|
-  %table
-    %tr
-      %td= "#{index+1}"
-    %tr
-      %td= review.title
-    %tr
-      %td= review.content
-
+= render :partial => 'shared/show_feedback', :locals => {:feedbackable => @restaurant}
