@@ -4,10 +4,6 @@ require 'json'
 require 'action_view'
 require 'yelp_access'
 
-# move to config?
-LINEUP_DEBUG = true
-MENU_DEBUG = true
-
 ######################################################################
 ######################################################################
 # ScraperBase: Base class for scraper classes.  Handles the grunt
@@ -54,11 +50,14 @@ class WeeklyMenuData < ScraperBase
   # path to the saved weekly lineup json files
   LINEUPS_PATH = Rails.root.join("tmp/waiter/lineups")
 
-  def download_and_populate_db_in_stages
+  def download_and_populate_db_in_stages(debug_mode = false)
     # download lineup + all restaurant menu information and save locally as
     # .json files.
 
-    if LINEUP_DEBUG
+    @lineup_from_cache = debug_mode
+    @menus_from_cache = debug_mode
+
+    if @lineup_from_cache
       # if we're running in debug mode, skip download stage and just
       # use last version of downloaded lineup
 
@@ -135,6 +134,10 @@ class WeeklyMenuData < ScraperBase
   def get_service_info_by_day
     (MONDAY..FRIDAY).each do |day|
       [EARLY, LATE].each do |earlylate|
+        if @data[earlylate][day]["carts"].empty?
+          next
+        end
+
         (FIRST_CHOICE..LAST_CHOICE).each do |choice|
           yield @data[earlylate][day]["carts"][choice]["service"]
         end
@@ -152,7 +155,7 @@ class WeeklyMenuData < ScraperBase
 
       puts "Downloading menu for restaurant: #{name}"
       @menus[menu_id] = RestaurantMenuData.new
-      @menus[menu_id].retrieve_menu_data(menu_id)
+      @menus[menu_id].retrieve_menu_data(menu_id, @menus_from_cache)
     end
   end
 
@@ -167,6 +170,10 @@ class WeeklyMenuData < ScraperBase
     # not using generator here because I need a little flexibility to get date
     [EARLY, LATE].each do |earlylate|
       (MONDAY..FRIDAY).each do |day|
+
+        if @data[earlylate][day]["carts"].empty?
+          next
+        end
 
         # ex: "2013-04-01T11:45:00-07:00"  aha!  a ruby datetime object... hehe
         datestr = @data[earlylate][day]["date"]
@@ -294,10 +301,10 @@ class RestaurantMenuData < ScraperBase
 
   attr_accessor :date_for
 
-  def retrieve_menu_data(menu_id)
+  def retrieve_menu_data(menu_id, debug_mode = false)
     @file_path = File.join(MENUS_PATH, "#{menu_id}.json")
 
-    if not MENU_DEBUG or not File.exists?(@file_path)
+    if not debug_mode or not File.exists?(@file_path)
       # need to use mechanize here... simple http get does not work.
       url = "https://www.waiter.com/menus/#{menu_id}.json"
       puts "Download menu from #{url}"
@@ -530,14 +537,11 @@ class RestaurantMenuData < ScraperBase
     @restaurant_parent.dishes.where(:active => false).includes(:course).each do |inactive_dish|
       qresults = find_best_match_for_inactive_dish(inactive_dish)
       if qresults.empty?
-        #debugger
         puts "Could not find match for: #{inactive_dish.name}"
       else
         if qresults.count > 1
-          #debugger
           puts "DETECTED MORE THAN ONE ACTIVE!"
         end
-        #debugger
         #puts "Found match for inactive item: count: #{qresults[0].updated_at} #{qresults[0].name}"
       end
     end
