@@ -1,0 +1,7 @@
+#restaurant-rater{:id => restaurant.id}
+  - range = get_rating(dish.id) ? (0..5) :
+  - options = {:'data-method' => 'post', :'data-remote' => 'true', :'data-url' => restaurant_rate_path(restaurant)}
+  - if not get_rating(restaurant.id) then options[:prompt] = "Rate me" end
+  = select_tag "rating", options_for_select((1..5), get_rating(restaurant.id)), options
+
+  %span.restaurant-rater-flash#restaurant_rater_flash{:id => restaurant.id}

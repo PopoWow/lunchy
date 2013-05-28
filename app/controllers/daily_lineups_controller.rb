@@ -48,6 +48,8 @@ class DailyLineupsController < ApplicationController
       return
     end
 
+    get_info_for_current_user(@lineup.id)
+
     @previous = DailyLineup.where("date < :today", {:today => @lineup.date}).
                             order(:date).reverse_order # relation
     @next = DailyLineup.where("date > :today", {:today => @lineup.date}).
@@ -118,4 +120,47 @@ class DailyLineupsController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def get_info_for_current_user(lineup_id)
+    if not current_user
+      return
+    end
+
+    if lineup_id.respond_to? :id
+      lineup_id = lineup_id.id
+    end
+
+    res = DailyLineup.select("restaurants.id AS restaurant_id").
+                      joins(:restaurants).
+                      where(:id => lineup_id)
+    ids = []
+    res.each {|item| ids << item.attributes["restaurant_id"]}
+
+    # ids now has a list of restaurant IDs for this lineup.
+
+    # do this with a massive join?
+    res = Restaurant.select("restaurants.id AS restaurant_id, ratings.id AS rating_id, ratings.value AS rating_value").
+                     joins("INNER JOIN ratings ON restaurants.id = ratings.ratable_id").
+                     where("ratings.ratable_type = 'Restaurant'").
+                     where("restaurants.id IN (?)", ids).
+                     where("ratings.user_id = ?", current_user)
+    rating_data = {}
+    res.each do |item|
+      rating_data[item.attributes["restaurant_id"]] = {:rating_id => item.attributes["rating_id"],
+                                                       :rating_value => item.attributes["rating_value"]}
+    end
+
+    res = Restaurant.select("restaurants.id AS restaurant_id, reviews.id AS review_id").
+                     joins("INNER JOIN reviews ON restaurants.id = reviews.reviewable_id").
+                     where("reviews.reviewable_type = 'Restaurant'").
+                     where("restaurants.id IN (?)", ids).
+                     where("reviews.user_id = ?", current_user)
+    review_data = {}
+    res.each do |item|
+      review_data[item.attributes["restaurant_id"]] = {:review_id => item.attributes["review_id"]}
+    end
+
+    @feedback_info = rating_data.deep_merge(review_data)
+  end
+
 end

@@ -1,0 +1,8 @@
+- if current_user
+  %tr
+    %td
+      - if @feedback_info and @feedback_info[restaurant.id.to_s] then review_id = @feedback_info[restaurant.id.to_s][:review_id] end
+      - if review_id
+        = link_to 'Edit Review', edit_review_path(review_id)
+      - else
+        = link_to 'Write Review', new_restaurant_review_path(restaurant)

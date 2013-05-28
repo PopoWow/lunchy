@@ -11,7 +11,9 @@
     %tr
       %td= restaurant.description
   %tr
-    %td
-      = pluralize(restaurant.reviews.length, 'Review') \
-      = "Rating: #{restaurant.star_rating}"
+    %td{:colspan => 2}
+      #lineup_feedback{:id => restaurant.id}
+        = pluralize(restaurant.reviews.length, 'Review')
+        \|
+        Rating: #{restaurant.star_rating} (#{restaurant.valid_rating_count} ratings)
 

@@ -37,6 +37,10 @@ class Restaurant < ActiveRecord::Base
     ratings.where("value != '0'").average(:value).to_f.round(1)
   end
 
+  def valid_rating_count
+    ratings.where("value != '0'").count
+  end
+
   def feedbacks
     Review.select("*").
            joins(%Q[FULL OUTER JOIN ratings ON reviews.user_id = ratings.user_id

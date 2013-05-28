@@ -19,16 +19,18 @@
 
 %a{:href => root_path}home
 
+= debug @feedback_info
+
 %table
   %tr
     %td{:colspan => 2}
       %b Date:
       =@lineup.date
-  - @lineup.schedulings.includes(:restaurant => :reviews).each do |scheduling|
+  - # Don't eager load anything here (e.g. review/rating), rely on fragment caching instead!
+  - @lineup.schedulings.each do |scheduling|
     %tr
       %td
         %b= "%s %d:" % [(scheduling.shift == 1 ? "Early" : "Late"), scheduling.position]
     = render :partial => "lineup_item",
-             :locals => { :lineup => @lineup,
-                          :scheduling => scheduling,
-                          :restaurant => scheduling.restaurant }
+             :locals => { :restaurant => scheduling.restaurant }
+    = render :partial => "item_user", :locals => {:restaurant => scheduling.restaurant}
