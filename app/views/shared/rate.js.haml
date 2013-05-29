@@ -1,0 +1,2 @@
+$("#ratable_rater_flash_#{@response[:target].id}").text("#{@response[:notice]}")
+$("#updatable_rating_#{@response[:target].id}").replaceWith("#{j render(:partial =>'shared/rating_display', :locals => {:ratable => @response[:target]})}")

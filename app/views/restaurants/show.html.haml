@@ -5,16 +5,11 @@
 \|
 = link_to 'write review', new_restaurant_review_path(@restaurant)
 
-%div
-  %div
-    - cur_rating = @restaurant.ratings.for_user(current_user).empty? ? 0 : @restaurant.ratings.for_user(current_user).first.value
-    = select_tag "rating", options_for_select(1..5, cur_rating),
-      :prompt => "Rate me",
-      :'data-method' => 'post',
-      :'data-remote' => 'true',
-      :'data-url' => restaurant_rate_path(@restaurant.id)
-  %div.rate-result hi there
-
+- if current_user
+  = render :partial => 'shared/ratable_rater',
+           :locals => {:id => @restaurant.id,
+                       :url => restaurant_rate_path(@restaurant),
+                       :rating => current_user.get_restaurant_rating(@restaurant)}
 
 %p
   %img{:src => "http://www.waiter.com" + @restaurant.logo_url, :alt => "img"}

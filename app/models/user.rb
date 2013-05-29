@@ -30,4 +30,28 @@ class User < ActiveRecord::Base
   def set_new_hashed_password(new_password)
     self.send :"#{sorcery_config.password_attribute_name}=", new_password
   end
+
+
+  def get_review(reviewable_object)
+    if reviewa
+    reviews.where("reviews.reviewable_id = ? AND reviews.reviewable_type = 'Restaurant'", restaurant_id).first
+  end
+
+=begin
+  def get_restaurant_review(restaurant_id)
+    reviews.where("reviews.reviewable_id = ? AND reviews.reviewable_type = 'Restaurant'", restaurant_id).first
+  end
+
+  def get_restaurant_rating(restaurant_id)
+    ratings.where("ratings.ratable_id = ? AND ratings.ratable_type = 'Restaurant'", restaurant_id).first
+  end
+
+  def get_restaurant_review_id(restaurant_id)
+    review = get_restaurant_review(restaurant_id)
+    if review
+      review.id
+    end
+  end
+=end
+
 end

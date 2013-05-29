@@ -97,18 +97,19 @@ class RestaurantsController < ApplicationController
     rating = query.first_or_initialize
 
     # check and see if the item is changed or new.
-    response = {}
+    @response = {}
     if query.exists?
-      response[:text] = "Rating changed from #{rating.value} to #{params[:rating]}"
+      @response[:notice] = "Rating changed from #{rating.value} to #{params[:rating]}"
     else
-      response[:text] = "Thank you for rating this restaurant!"
+      @response[:notice] = "Thank you for rating this restaurant!"
     end
 
     rating.value = params[:rating]
     rating.save!
 
-    @info = response[:text]
-    render :rate
+    @response[:target] = rating.ratable
+
+    render "shared/rate"
   end
 
 end

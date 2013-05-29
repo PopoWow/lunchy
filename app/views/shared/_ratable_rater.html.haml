@@ -1,0 +1,12 @@
+- # Required locals:
+- #   id - Ratable item ID
+- #   url - POST url to add rating.
+- #   rating - Rating value for current user.
+
+%span#ratable-rater{:id => id}
+  - options = {:'data-method' => 'post', :'data-remote' => 'true', :'data-url' => url}
+  - if rating then if rating.respond_to? :value then rating = rating.value end end
+  - if not rating then options[:prompt] = "Rate me" end
+  = select_tag "rating", options_for_select((1..5), rating), options
+
+%span.ratable-rater-flash#ratable_rater_flash{:id => id}

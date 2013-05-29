@@ -15,5 +15,5 @@
       #lineup_feedback{:id => restaurant.id}
         = pluralize(restaurant.reviews.length, 'Review')
         \|
-        Rating: #{restaurant.star_rating} (#{restaurant.valid_rating_count} ratings)
+        = render :partial => 'shared/rating_display', :locals => {:ratable => restaurant}
 

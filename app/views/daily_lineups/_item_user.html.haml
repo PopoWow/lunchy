@@ -1,8 +1,14 @@
+- # Partial that shows current user's feedback information.
+
 - if current_user
   %tr
-    %td
-      - if @feedback_info and @feedback_info[restaurant.id.to_s] then review_id = @feedback_info[restaurant.id.to_s][:review_id] end
+    %td{:colspan => 2}
+      - review_id = get_user_review_id(restaurant)
       - if review_id
         = link_to 'Edit Review', edit_review_path(review_id)
       - else
         = link_to 'Write Review', new_restaurant_review_path(restaurant)
+      = render :partial => 'shared/ratable_rater',
+               :locals => {:id => restaurant.id,
+                           :url => restaurant_rate_path(restaurant),
+                           :rating => get_user_rating_value(restaurant)}

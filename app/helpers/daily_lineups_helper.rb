@@ -16,4 +16,26 @@ module DailyLineupsHelper
     end
   end
 
+  def get_user_rating_value(ratable_id)
+    if ratable_id.respond_to? :id
+      ratable_id = ratable_id.id
+    end
+
+    key = ratable_id.to_s
+    if @feedback_info and @feedback_info[ratable_id.to_s]
+      return @feedback_info[ratable_id.to_s][:rating_value]
+    end
+  end
+
+  def get_user_review_id(reviewable_id)
+    if reviewable_id.respond_to? :id
+      reviewable_id = reviewable_id.id
+    end
+
+    key = reviewable_id.to_s
+    if @feedback_info and @feedback_info[key]
+      return @feedback_info[key][:review_id]
+    end
+  end
+
 end
