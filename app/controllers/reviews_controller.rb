@@ -1,6 +1,10 @@
 class ReviewsController < ApplicationController
-  before_filter :set_review_target, :only => [:index, :new, :create]
-  before_filter :init_history
+  before_filter :set_review_target, :only => [:index, :index_all, :new, :edit, :create]
+
+  # call ApplicationController helpers to set up navigation bar info
+  before_filter :init_history, :only => [:index, :index_all, :new, :edit, :create]
+  # Add review specific entries to navigation bar
+  before_filter :set_history, :only => [:index, :index_all, :new, :edit, :create]
 
   # GET /reviews
   # GET /reviews.json
@@ -35,9 +39,8 @@ class ReviewsController < ApplicationController
   # GET /reviews/new
   # GET /reviews/new.json
   def new
-    set_history
-
     @review = Review.new
+    @url = polymorphic_path([@review_target, @review])
 
     respond_to do |format|
       format.html # new.html.erb
@@ -47,15 +50,12 @@ class ReviewsController < ApplicationController
 
   # GET /reviews/1/edit
   def edit
-    set_history
-    @review = Review.find(params[:id])
   end
 
   # POST /reviews
   # POST /reviews.json
   def create
-    #debugger
-
+    debugger
     @review = current_user.reviews.new(params[:review])
     @review.reviewable = @review_target
 
@@ -103,6 +103,9 @@ class ReviewsController < ApplicationController
       @review_target = Restaurant.find(params[:restaurant_id])
     elsif /dish/ =~ request.path and params[:dish_id]
       @review_target = Dish.includes(:restaurant).find(params[:dish_id])
+    elsif /reviews/ =~ request.path and params[:id]
+      @review = Review.find(params[:id])
+      @review_target = @review.reviewable
     end
 
     @review_target || not_found
@@ -111,6 +114,7 @@ class ReviewsController < ApplicationController
   def set_history
     raise ArgumentError unless @review_target
 
+    #debugger
     if @review_target.respond_to? :restaurant
       add_to_history(@review_target.restaurant.name, restaurant_path(@review_target.restaurant))
       add_to_history('dishes', restaurant_dishes_path(@review_target.restaurant))

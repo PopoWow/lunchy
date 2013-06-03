@@ -16,7 +16,7 @@ module RatableHelper
     # need to set this AFTER the save!  Otherwise modifed timestamp is outdated!
     @response[:target] = @rate_target
 
-    render :rate
+    render "shared/rate"
   end
 
   def find_ratable

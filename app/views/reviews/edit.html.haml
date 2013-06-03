@@ -2,4 +2,8 @@
 
 %h3= "Edit review for #{@review_target.name}"
 
+- if current_user
+  = render :partial => 'shared/ratable_rater',
+           :locals => {:ratable => @review_target}
+
 = render 'form'

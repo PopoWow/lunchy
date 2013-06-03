@@ -2,14 +2,7 @@
 
 →
 = link_to 'dishes', restaurant_dishes_path(@restaurant)
-\|
-= link_to 'write review', new_restaurant_review_path(@restaurant)
-
-- if current_user
-  = render :partial => 'shared/ratable_rater',
-           :locals => {:id => @restaurant.id,
-                       :url => restaurant_rate_path(@restaurant),
-                       :rating => current_user.get_restaurant_rating(@restaurant)}
+= render :partial => "shared/user_navigator", :locals => {:target => @restaurant}
 
 %p
   %img{:src => "http://www.waiter.com" + @restaurant.logo_url, :alt => "img"}

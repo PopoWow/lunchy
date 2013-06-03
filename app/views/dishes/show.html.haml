@@ -1,7 +1,6 @@
 - # Dishes/show
 
-→
-= link_to 'write review', new_dish_review_path(@dish)
+= render :partial => "shared/user_navigator", :locals => {:target => @dish}
 
 %p
   %b Waiter:

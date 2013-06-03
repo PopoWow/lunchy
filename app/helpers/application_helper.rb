@@ -1,6 +1,7 @@
 # encoding: UTF-8
 
 module ApplicationHelper
+  include FeedbackManager
 
   # Helper function that returns an HTML div block that
   # defines the user navigation links.  If a user is

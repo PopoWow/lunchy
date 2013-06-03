@@ -1,4 +1,8 @@
 module DailyLineupsHelper
+=begin
+  retrieve all the ratings for the current user for this lineup's restaurants.
+  this was converted to DailyLineupController#get_info_for_current_user
+
   def get_ratings_for_current_user(lineup_id)
     if current_user
       qres = DailyLineup.select("restaurants.id as restaurant_id, ratings.id as rating_id, ratings.value as rating_value").
@@ -37,5 +41,6 @@ module DailyLineupsHelper
       return @feedback_info[key][:review_id]
     end
   end
+=end
 
 end

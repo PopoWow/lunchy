@@ -1,4 +1,6 @@
 class DailyLineupsController < ApplicationController
+  include FeedbackManager
+
   # GET /daily_lineups
   # GET /daily_lineups.json
   def index
@@ -14,19 +16,21 @@ class DailyLineupsController < ApplicationController
   # GET /daily_lineups/1
   # GET /daily_lineups/1.json
   def show
-    # Don't eager load here (firstly because it does no good the way
-    # DailyLineup is organized.  EL still runs 6 queries for the 6
-    # choices!).  But also, because we're caching each restaurant
-    # as a fragment so eager loading it here would be actually
-    # wasteful.
+    debugger
 
     @hide_history_bar = true
 
     if params["id"] == "today"
-      @lineup = DailyLineup.where("date >= :today", {:today => Date.today}).order(:date).first
+      @lineup = DailyLineup.includes(:restaurants).
+                            where("date >= :today", {:today => Date.today}).
+                            order(:date).
+                            first
     else
       begin
-        @lineup = DailyLineup.find(params[:id])
+        @lineup = DailyLineup.includes(:restaurants).
+                              where(:id => params[:id]).
+                              first
+
       rescue ActiveRecord::RecordNotFound
         @lineup = nil
       end
@@ -48,7 +52,7 @@ class DailyLineupsController < ApplicationController
       return
     end
 
-    get_info_for_current_user(@lineup.id)
+    query_user_feedback_for_lineup_restaurants
 
     @previous = DailyLineup.where("date < :today", {:today => @lineup.date}).
                             order(:date).reverse_order # relation
@@ -121,46 +125,14 @@ class DailyLineupsController < ApplicationController
     end
   end
 
-  def get_info_for_current_user(lineup_id)
-    if not current_user
-      return
-    end
 
-    if lineup_id.respond_to? :id
-      lineup_id = lineup_id.id
-    end
 
-    res = DailyLineup.select("restaurants.id AS restaurant_id").
-                      joins(:restaurants).
-                      where(:id => lineup_id)
-    ids = []
-    res.each {|item| ids << item.attributes["restaurant_id"]}
+  def query_user_feedback_for_lineup_restaurants()
+    return if not current_user
+    return if not defined? @lineup
 
-    # ids now has a list of restaurant IDs for this lineup.
-
-    # do this with a massive join?
-    res = Restaurant.select("restaurants.id AS restaurant_id, ratings.id AS rating_id, ratings.value AS rating_value").
-                     joins("INNER JOIN ratings ON restaurants.id = ratings.ratable_id").
-                     where("ratings.ratable_type = 'Restaurant'").
-                     where("restaurants.id IN (?)", ids).
-                     where("ratings.user_id = ?", current_user)
-    rating_data = {}
-    res.each do |item|
-      rating_data[item.attributes["restaurant_id"]] = {:rating_id => item.attributes["rating_id"],
-                                                       :rating_value => item.attributes["rating_value"]}
-    end
-
-    res = Restaurant.select("restaurants.id AS restaurant_id, reviews.id AS review_id").
-                     joins("INNER JOIN reviews ON restaurants.id = reviews.reviewable_id").
-                     where("reviews.reviewable_type = 'Restaurant'").
-                     where("restaurants.id IN (?)", ids).
-                     where("reviews.user_id = ?", current_user)
-    review_data = {}
-    res.each do |item|
-      review_data[item.attributes["restaurant_id"]] = {:review_id => item.attributes["review_id"]}
-    end
-
-    @feedback_info = rating_data.deep_merge(review_data)
+    # call into feedback manager
+    query_user_feedback_for_items(@lineup.restaurants)
   end
 
 end

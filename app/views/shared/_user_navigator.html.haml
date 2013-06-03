@@ -1,0 +1,11 @@
+- if current_user
+  %div
+    ↓
+    - review_id = current_user.get_review_info(target, :id)
+    - if review_id
+      = link_to 'Edit Review', edit_review_path(review_id)
+    - else
+      = link_to 'Write Review', polymorphic_path(['new', target, 'review'])
+    \|
+    = render :partial => 'shared/ratable_rater',
+             :locals => {:ratable => target}

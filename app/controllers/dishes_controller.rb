@@ -1,5 +1,6 @@
 class DishesController < ApplicationController
   include RatableHelper
+  include FeedbackManager
 
   before_filter :init_history, :only => [:index, :show]
 
@@ -14,27 +15,14 @@ class DishesController < ApplicationController
     # using that list.  Stores the rating info in a list
     # that is referred to by the view to populate the
     # initial state of the rating select_tags
-    dish_ids = []
+    active_dishes = []
     @restaurant.active_courses.includes(:active_dishes).each do |course|
       # tried using active_dishes.pluck(:id) but I didn't like how that
       # was causing n+1 queries...
-      course.active_dishes.each do |dish|
-        dish_ids << dish.id
-      end
+      active_dishes.concat(course.active_dishes)
     end
 
-    conditions = {:user_id => current_user,
-                  :ratable_type => 'Dish',
-                  :ratable_id => dish_ids}
-    user_ratings = Rating.where(conditions).all
-    @user_ratings = {}
-
-    user_ratings.each do |rating|
-      @user_ratings[rating.ratable_id] = [rating.id, rating.value]
-    end
-
-    # @user_ratings is not referrable to get rating state for
-    # specific dishes for current_user.
+    query_user_feedback_for_items(active_dishes)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -114,4 +102,5 @@ class DishesController < ApplicationController
       format.json { head :no_content }
     end
   end
+
 end

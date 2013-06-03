@@ -1,4 +1,6 @@
 class RestaurantsController < ApplicationController
+  include RatableHelper
+
   before_filter :init_history, :only => :show
 
   # GET /restaurants
@@ -90,6 +92,7 @@ class RestaurantsController < ApplicationController
   end
 
   # POST /restaurant/1/rate
+=begin
   def rate
     query = Rating.where(:user_id => current_user,
                          :ratable_id => params[:restaurant_id],
@@ -111,5 +114,6 @@ class RestaurantsController < ApplicationController
 
     render "shared/rate"
   end
+=end
 
 end

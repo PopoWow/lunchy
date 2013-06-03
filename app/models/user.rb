@@ -32,9 +32,38 @@ class User < ActiveRecord::Base
   end
 
 
+
+
+
+
   def get_review(reviewable_object)
-    if reviewa
-    reviews.where("reviews.reviewable_id = ? AND reviews.reviewable_type = 'Restaurant'", restaurant_id).first
+    if reviewable_object.respond_to? :id
+      reviews.where("reviews.reviewable_id = ? AND reviews.reviewable_type = ?",
+                    reviewable_object.id, reviewable_object.class.to_s).
+              first
+    end
+  end
+
+  def get_review_info(reviewable_object, field)
+    review = get_review(reviewable_object)
+    if review and review.respond_to? field
+      review.send(field)
+    end
+  end
+
+  def get_rating(ratable_object)
+    if ratable_object.respond_to? :id
+      ratings.where("ratings.ratable_id = ? AND ratings.ratable_type = ?",
+                    ratable_object.id, ratable_object.class.to_s).
+              first
+    end
+  end
+
+  def get_rating_info(ratable_object, field)
+    rating = get_rating(ratable_object)
+    if rating and rating.respond_to? field
+      rating.send(field)
+    end
   end
 
 =begin

@@ -1,2 +1,0 @@
-$("#dish_rater_flash_#{@response[:target].id}").text("#{@response[:notice]}")
-$("#dish_block_#{@response[:target].id}").replaceWith("#{j render(:partial =>'dish_block', :locals => {:dish => @response[:target]})}")

@@ -2,5 +2,8 @@
 
 %h3= "New review for #{@review_target.name}"
 
-= select_tag "rating", options_for_select(1..5)
+- if current_user
+  = render :partial => 'shared/ratable_rater',
+           :locals => {:ratable => @review_target}
+
 = render 'form'

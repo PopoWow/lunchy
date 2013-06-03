@@ -3,12 +3,10 @@
 - if current_user
   %tr
     %td{:colspan => 2}
-      - review_id = get_user_review_id(restaurant)
+      - review_id = current_user.get_review_info(restaurant, :id)
       - if review_id
         = link_to 'Edit Review', edit_review_path(review_id)
       - else
         = link_to 'Write Review', new_restaurant_review_path(restaurant)
       = render :partial => 'shared/ratable_rater',
-               :locals => {:id => restaurant.id,
-                           :url => restaurant_rate_path(restaurant),
-                           :rating => get_user_rating_value(restaurant)}
+               :locals => {:ratable => restaurant}

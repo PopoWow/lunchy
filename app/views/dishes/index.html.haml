@@ -14,4 +14,5 @@
         - course.active_dishes.each do |dish|
           .dish-block-container#dish_block_container{:id => dish.id}
             = render :partial => 'dish_block', :locals => {:dish => dish}
-          = render :partial => 'dish_rater', :locals => {:dish => dish}
+          = render :partial => 'shared/user_feedback',
+                   :locals => {:target => dish, :cached_info => @user_feedback[dish.id]}
