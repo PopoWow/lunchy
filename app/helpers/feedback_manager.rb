@@ -67,8 +67,11 @@ module FeedbackManager
   private
   def get_cached_feedback_info(feedbackable, info_name)
     if defined? @user_feedback
+      # if user feedback is set, then return value if any, otherwise nil.
       @user_feedback[feedbackable.id][info_name] if @user_feedback[feedbackable.id]
     elsif current_user
+      # no feedback was set, query DB for user's value (modem access method
+      # passed in block)
       yield
     end
   end
