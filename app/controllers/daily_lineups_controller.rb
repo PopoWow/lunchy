@@ -16,21 +16,19 @@ class DailyLineupsController < ApplicationController
   # GET /daily_lineups/1
   # GET /daily_lineups/1.json
   def show
-    debugger
+    #debugger
 
     @hide_history_bar = true
 
     if params["id"] == "today"
-      @lineup = DailyLineup.includes(:restaurants).
+      @lineup = DailyLineup.includes(:schedulings => :restaurant).
                             where("date >= :today", {:today => Date.today}).
                             order(:date).
                             first
     else
       begin
-        @lineup = DailyLineup.includes(:restaurants).
-                              where(:id => params[:id]).
-                              first
-
+        @lineup = DailyLineup.includes(:schedulings => :restaurant).
+                              find(params[:id])
       rescue ActiveRecord::RecordNotFound
         @lineup = nil
       end
@@ -43,6 +41,7 @@ class DailyLineupsController < ApplicationController
       session[:lineup_id] = @lineup.id
     else
       session[:lineup_id] = nil
+
       # there was no lineup found.  Either because the ID is bad or there just isn't
       # information available for "today".  Show error page witha link back to the
       # last valid lineup in case user want to review something.
