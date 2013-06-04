@@ -1,0 +1,18 @@
+- cache ['navbar', @lineup] do
+  - previous_rec = @previous.first
+  - if previous_rec
+    %a{:href => lineups_path(previous_rec)}previous
+    |
+  -else
+    back
+    \|
+
+  - next_rec = @next.first
+  - if next_rec
+    %a{:href => lineups_path(next_rec)}next
+    |
+  -else
+    next
+    \|
+
+%a{:href => root_path}home
