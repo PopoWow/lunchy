@@ -15,4 +15,4 @@
         = pluralize(dish.reviews.length, 'Review')
       \|
       %span#dish-rating{:id => dish.id}
-        = "Rating: #{dish.star_rating} (#{dish.valid_rating_count} ratings)"
+        = "Rating: #{dish.valid_rating_average} (#{dish.valid_rating_count} ratings)"
