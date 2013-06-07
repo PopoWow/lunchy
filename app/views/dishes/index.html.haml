@@ -10,13 +10,13 @@
     - # caching.  Dish frags are evaluated once until something changes
     - # about them... eg: ratings/reviews (via :touch -> :dish)
     - @restaurant.active_courses.includes(:active_dishes).each do |course|
-      %li
+      %li#course{:id => course.id}
         .dishes-course-name
           %h3= course.name
         - if course.description
           .dishes-course-desc
             %h5= course.description
-        %ul
+        %ul#dishes_list{:id => course.id}
           %li
             - course.active_dishes.each do |dish|
               = render :partial => 'dish_block', :locals => {:dish => dish}
