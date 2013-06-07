@@ -3,16 +3,15 @@
 - # reviews/ratings are added for dish.
 
 - cache ['index', dish] do
-  #dish_block{:id => dish.id}
-    %h5
-      %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
-      %span= dish.price
-    = render :partial => "desc_row", :locals => { :item => dish }
+  .dish-block-content
+    .dish-block-content-header
+      %h4
+        %a{:href => dish_path(dish)}= "#{dish.name} pos: #{dish.position}"
+        %span= dish.price
+    - if dish.description
+      .dish-block-desc
+        %h5= dish.description
 
     - # Display review/rating info for this dish.
-    #dish-feedback{:id => dish.id}
-      %span#dish-reviews{:id => dish.id}
-        = pluralize(dish.reviews.length, 'Review')
-      \|
-      %span#dish-rating{:id => dish.id}
-        = "Rating: #{dish.valid_rating_average} (#{dish.valid_rating_count} ratings)"
+    .dish-block-feedback
+      = render :partial => 'shared/all_feedback', :locals => {:feedbackable => dish}

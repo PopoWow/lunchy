@@ -2,17 +2,16 @@
 
 = render :partial => "shared/user_navigator", :locals => {:target => @dish}
 
-%p
-  %b Waiter:
-  = @dish.waiter_id
-%p
-  %b Name:
-  = @dish.name
-%p
-  %b Description:
-  = @dish.description
-%p
-  %b Price:
-  = @dish.price
+- cache ['show', @dish] do
+  %p
+    %h2= @dish.name
+    %h5= @dish.description
+
+  %p
+    %dl
+      %dt
+        %b Price:
+      %dd
+        = @dish.price
 
 = render :partial => 'shared/show_feedback', :locals => {:feedbackable => @dish}

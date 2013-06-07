@@ -1,18 +1,24 @@
-%p
-  %h2= @restaurant.name
-  %h4= @restaurant.description
+- # dishes#index
 
 %p
-  - # foregoing eager loading of review/ratings here in favor of fragment
-  - # caching.  Dish frags are evaluated once until something changes
-  - # about them... eg: ratings/reviews (via :touch -> :dish)
-  - @restaurant.active_courses.includes(:active_dishes).each do |course|
-    .dishes#course{:id => course.id}
-      %h3= "#{course.name} pos:#{course.position}"
-      = render :partial => "desc_row", :locals => {:item => course}
-      .course-dishes#course_dishes{:id => course.id}
-        - course.active_dishes.each do |dish|
-          .dish-block-container#dish_block_container{:id => dish.id}
-            = render :partial => 'dish_block', :locals => {:dish => dish}
-          - if current_user
-            = render :partial => 'shared/user_feedback', :locals => {:target => dish}
+  %h2= @restaurant.name
+  %h5= @restaurant.description
+
+%p
+  %ol
+    - # foregoing eager loading of review/ratings here in favor of fragment
+    - # caching.  Dish frags are evaluated once until something changes
+    - # about them... eg: ratings/reviews (via :touch -> :dish)
+    - @restaurant.active_courses.includes(:active_dishes).each do |course|
+      %li
+        .dishes-course-name
+          %h3= course.name
+        - if course.description
+          .dishes-course-desc
+            %h5= course.description
+        %ul
+          %li
+            - course.active_dishes.each do |dish|
+              = render :partial => 'dish_block', :locals => {:dish => dish}
+              - if current_user
+                = render :partial => 'shared/user_feedback', :locals => {:target => dish}

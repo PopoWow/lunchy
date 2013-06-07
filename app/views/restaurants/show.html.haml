@@ -4,27 +4,30 @@
 = link_to 'dishes', restaurant_dishes_path(@restaurant)
 = render :partial => "shared/user_navigator", :locals => {:target => @restaurant}
 
-%p
-  %img{:src => "http://www.waiter.com" + @restaurant.logo_url, :alt => "img"}
+- cache ['show', @restaurant] do
+  %p
+    %img{:src => "http://www.waiter.com" + @restaurant.logo_url, :alt => "img"}
 
-%p
-  %b Name:
-  = @restaurant.name
+  %dl
+    %dt
+      %b Name:
+    %dd= @restaurant.name
 
-%p
-  %b Description:
-  = @restaurant.description
+    - if @restaurant.description and not @restaurant.description.empty?
+      %dt
+        %b Description:
+      %dd= @restaurant.description
 
-%p
-  %b Address:
-  = @restaurant.address
+    %dt
+      %b Address:
+    %dd= @restaurant.address
 
-%p
-  %b Food type:
-  = @restaurant.food_type
+    %dt
+      %b Food type:
+    %dd= @restaurant.food_type
 
-%p
-  %b Yelp Id:
-  = @restaurant.yelp_id
+    %dt
+      %b Yelp ID:
+    %dd= @restaurant.yelp_id
 
 = render :partial => 'shared/show_feedback', :locals => {:feedbackable => @restaurant}
