@@ -2,7 +2,6 @@ class Review < ActiveRecord::Base
   # Polymorphic, thus not inversable
   belongs_to :reviewable, :polymorphic => true, :touch => true
   belongs_to :user, :inverse_of => :reviews
-  scope :for_user, lambda {|user| where("user_id = ?", user.id) }
 
   attr_accessible :title, :content
 
