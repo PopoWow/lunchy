@@ -55,7 +55,6 @@ class ReviewsController < ApplicationController
   # POST /reviews
   # POST /reviews.json
   def create
-    debugger
     @review = current_user.reviews.new(params[:review])
     @review.reviewable = @review_target
 
