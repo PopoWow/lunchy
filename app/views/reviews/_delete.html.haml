@@ -1,0 +1,4 @@
+
+= form_for @review, {:url => get_form_url(params[:action]), :method => :delete} do |f|
+  .actions
+    = f.submit 'Delete'
