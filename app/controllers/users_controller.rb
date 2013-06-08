@@ -1,6 +1,9 @@
 class UsersController < ApplicationController
   skip_before_filter :require_login, :only => [:new, :create, :activate]
 
+  # call ApplicationController helpers to set up navigation bar info
+  before_filter :init_history
+
   def new
     @user = User.new
   end
