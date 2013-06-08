@@ -1,10 +1,14 @@
 class ReviewsController < ApplicationController
-  before_filter :set_review_target, :only => [:index, :index_all, :new, :edit, :create]
+  # for review-centric resourceful actions, find the review
+  before_filter :find_and_set_review, :only => [:show, :edit, :update, :destroy]
+  # find the target for the review, either by parsing the URL or using the one
+  # obtained by previous filter.
+  before_filter :find_and_set_review_target, :except => [:index_all]
 
   # call ApplicationController helpers to set up navigation bar info
-  before_filter :init_history, :only => [:index, :index_all, :new, :edit, :create]
+  before_filter :init_history
   # Add review specific entries to navigation bar
-  before_filter :set_history, :only => [:index, :index_all, :new, :edit, :create]
+  before_filter :set_history, :except => [:index_all]
 
   # GET /reviews
   # GET /reviews.json
@@ -28,8 +32,6 @@ class ReviewsController < ApplicationController
   # GET /reviews/1
   # GET /reviews/1.json
   def show
-    @review = Review.includes(:reviewable).find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.json { render json: @review }
@@ -40,16 +42,11 @@ class ReviewsController < ApplicationController
   # GET /reviews/new.json
   def new
     @review = Review.new
-    @url = polymorphic_path([@review_target, @review])
 
     respond_to do |format|
       format.html # new.html.erb
       format.json { render json: @review }
     end
-  end
-
-  # GET /reviews/1/edit
-  def edit
   end
 
   # POST /reviews
@@ -67,6 +64,11 @@ class ReviewsController < ApplicationController
         format.json { render json: @review.errors, status: :unprocessable_entity }
       end
     end
+  end
+
+  # GET /reviews/1/edit
+  def edit
+    # handled in before filters.
   end
 
   # PUT /reviews/1
@@ -88,22 +90,26 @@ class ReviewsController < ApplicationController
   # DELETE /reviews/1
   # DELETE /reviews/1.json
   def destroy
-    @review = Review.find(params[:id])
     @review.destroy
 
     respond_to do |format|
-      format.html { redirect_to reviews_url }
+      format.html { redirect_to @review_target, notice: 'Review was successfully deleted.' }
       format.json { head :no_content }
     end
   end
 
-  def set_review_target
+  def find_and_set_review
+    @review = Review.find(params[:id])
+
+    @review || not_found
+  end
+
+  def find_and_set_review_target
     if /restaurant/ =~ request.path and params[:restaurant_id]
       @review_target = Restaurant.find(params[:restaurant_id])
     elsif /dish/ =~ request.path and params[:dish_id]
       @review_target = Dish.includes(:restaurant).find(params[:dish_id])
     elsif /reviews/ =~ request.path and params[:id]
-      @review = Review.find(params[:id])
       @review_target = @review.reviewable
     end
 

@@ -1,5 +1,5 @@
-- options = defined?(@url) ? {:url => @url} : {}
-= form_for @review, options do |f|
+
+= form_for @review, :url => get_form_url(params[:action]) do |f|
   - if @review.errors.any?
     #error_explanation
       %h2= "#{pluralize(@review.errors.count, "error")} prohibited this review from being saved:"
