@@ -57,7 +57,7 @@ class ReviewsController < ApplicationController
 
     respond_to do |format|
       if @review.save
-        format.html { redirect_to @review.reviewable, notice: 'Review was successfully created.' }
+        format.html { redirect_to @review_target, notice: 'Review was successfully created.' }
         format.json { render json: @review, status: :created, location: @review }
       else
         format.html { render action: "new" }
@@ -78,7 +78,7 @@ class ReviewsController < ApplicationController
 
     respond_to do |format|
       if @review.update_attributes(params[:review])
-        format.html { redirect_to @review.reviewable, notice: 'Review was successfully updated.' }
+        format.html { redirect_to @review_target, notice: 'Review was successfully updated.' }
         format.json { head :no_content }
       else
         format.html { render action: "edit" }
@@ -119,8 +119,7 @@ class ReviewsController < ApplicationController
   def set_history
     raise ArgumentError unless @review_target
 
-    #debugger
-    if @review_target.respond_to? :restaurant
+    if @review_target.class == Dish
       add_to_history(@review_target.restaurant.name, restaurant_path(@review_target.restaurant))
       add_to_history('dishes', restaurant_dishes_path(@review_target.restaurant))
     end
