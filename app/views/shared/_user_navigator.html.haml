@@ -1,7 +1,7 @@
 - if current_user
   %div
     ↓
-    - review_id = current_user.get_review_info(target, :id)
+    - review_id = target.get_review_info(current_user, :id)
     - if review_id
       = link_to 'Edit Review', edit_review_path(review_id)
     - else
