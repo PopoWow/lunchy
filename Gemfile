@@ -10,6 +10,9 @@ gem 'rails', '3.2.13'
 group :development, :test do
   gem 'debugger'
   gem 'database_cleaner'
+  gem 'rspec-rails'
+  gem 'capybara'
+  gem 'factory_girl_rails'
 end
 
 # Using postgres for all configurations now.
@@ -45,7 +48,7 @@ gem 'jquery-rails'
 # To use debugger
 # gem 'debugger'
 
-gem 'haml-rails' # use haml instead of erb.  This is automatically pulled by fixture creation.
+gem 'haml-rails' # use haml instead of erb.
 gem 'mechanize' # used to scrape waiter.com
 gem 'sorcery'
 gem 'delayed_job_active_record'
@@ -53,6 +56,6 @@ gem 'delayed_job_active_record'
 
 # clean up logging
 gem 'quiet_assets', :group => :development
-# Use thin webserver instead of webrick.  Launch using "rails s thin""
+# Use thin webserver instead of webrick.  Launch using "rails s thin"
 gem 'thin'
 
