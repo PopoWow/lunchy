@@ -9,9 +9,11 @@ gem 'rails', '3.2.13'
 # for Heroku deployment - as described in Ap. A of ELLS book
 group :development, :test do
   gem 'debugger'
+  gem 'cucumber-rails', :require => false
   gem 'database_cleaner'
   gem 'rspec-rails'
   gem 'capybara'
+  gem 'launchy' # to pop up saved webpages?
   gem 'factory_girl_rails'
 end
 
