@@ -15,6 +15,8 @@ group :development, :test do
   gem 'capybara'
   gem 'launchy' # to pop up saved webpages?
   gem 'factory_girl_rails'
+  gem 'guard-cucumber'
+  gem 'guard-rspec'
 end
 
 # Using postgres for all configurations now.
