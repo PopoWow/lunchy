@@ -15,8 +15,10 @@ group :development, :test do
   gem 'capybara'
   gem 'launchy' # to pop up saved webpages?
   gem 'factory_girl_rails'
+  gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i # required for guard on mac
   gem 'guard-cucumber'
   gem 'guard-rspec'
+
 end
 
 # Using postgres for all configurations now.
