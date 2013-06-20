@@ -16,9 +16,11 @@ group :development, :test do
   gem 'launchy' # to pop up saved webpages?
   gem 'factory_girl_rails'
   gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i # required for guard on mac
+  gem 'wdm', :require => false if RUBY_PLATFORM =~ /mingw/i # required for guard on windows
+  gem 'spork', '~> 1.0rc' # speed up interminable load times for testing
   gem 'guard-cucumber'
   gem 'guard-rspec'
-
+  gem 'guard-spork'
 end
 
 # Using postgres for all configurations now.
