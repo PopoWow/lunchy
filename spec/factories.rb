@@ -13,7 +13,7 @@ FactoryGirl.define do
   end
 
   factory :restaurant do
-    sequence(:name) {|seq| "Establishment#{seq}"}
+    sequence(:name) {|seq| "Restaurant#{seq}"}
     # any other fields?
   end
 
@@ -65,7 +65,7 @@ FactoryGirl.define do
   end
 
   factory :dish do
-    sequence(:name) {|seq| "Meal#{seq}"}
+    sequence(:name) {|seq| "Dish#{seq}"}
 
     factory :dish_with_course do
       association :course, factory: :course_with_restaurant
