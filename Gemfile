@@ -9,7 +9,9 @@ gem 'rails', '3.2.13'
 # for Heroku deployment - as described in Ap. A of ELLS book
 group :development, :test do
   gem 'debugger'
-  gem 'cucumber-rails', :require => false
+  #gem 'cucumber-rails', :require => false
+  gem 'cucumber',  '1.2.5'
+  gem 'cucumber-rails', '1.3.0', :require => false
   gem 'database_cleaner'
   gem 'rspec-rails'
   gem 'capybara'
