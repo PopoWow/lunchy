@@ -1,14 +1,16 @@
 FactoryGirl.define do
   factory :user do
     # Creates an normal user.  ex: create(:user)
-    sequence(:nickname) {|seq| "foobsky#{seq}"}
-    password = "123"
-    email {"#{nickname}example.com"}
-    admin = false
+    sequence(:nickname) {|seq| "User#{seq}"}
+    password "123"
+    email    {"#{nickname}@example.com"}
+    admin    false
+
+    after(:build) { |user| p user }
 
     factory :admin do
       # Creates an "admin" user.  ex: create(:admin)
-      admin = true
+      admin  true
     end
   end
 
@@ -18,7 +20,7 @@ FactoryGirl.define do
   end
 
   factory :scheduling do
-    shift = 1
+    shift 1
 
     factory :scheduling_with_restaurant do
       restaurant
@@ -69,6 +71,14 @@ FactoryGirl.define do
 
     factory :dish_with_course do
       association :course, factory: :course_with_restaurant
+    end
+  end
+
+  factory :rating do
+    value 3
+
+    factory :restaurant_rating do
+
     end
   end
 

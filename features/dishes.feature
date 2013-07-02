@@ -6,5 +6,5 @@ Feature: Examine a dish page
   Scenario: Examine a restaurant
   	Given I have a dish
   	When I go to that dish's page
-  	Then I should see Meal1
+  	Then I should see Dish1
   	And I should see No reviews
