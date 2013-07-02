@@ -3,7 +3,8 @@
 
 
 guard 'spork', :wait => 120,
-			   :rspec => false, :test_unit => false,
+			   #:rspec => false,
+			   :test_unit => false,
 			   :cucumber_env => { 'RAILS_ENV' => 'test' }, :rspec_env => { 'RAILS_ENV' => 'test' } do
   watch('config/application.rb')
   watch('config/environment.rb')
@@ -27,7 +28,7 @@ guard 'cucumber', :cli => "--drb" do
   watch('spec/factories.rb')  				{ 'features' }
 end
 
-guard :rspec do
+guard :rspec, :cli => "--drb" do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
   watch('spec/spec_helper.rb')  { "spec" }
