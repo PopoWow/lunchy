@@ -6,7 +6,7 @@ FactoryGirl.define do
     email    {"#{nickname}@example.com"}
     admin    false
 
-    after(:build) { |user| p user }
+    after(:create) { |user| user.activate! }
 
     factory :admin do
       # Creates an "admin" user.  ex: create(:admin)
