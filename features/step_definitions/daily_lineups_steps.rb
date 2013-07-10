@@ -29,11 +29,12 @@ Given(/^I have a lineup with restaurants that have dishes that have ratings$/) d
   user = FactoryGirl.create(:user)
   lineup = FactoryGirl.create(:daily_lineup_with_schedulings_and_restaurants)
 
-  rests = [lineup.restaurants.first, lineup.restaurants.last]
-  rests.each_with_index do |restaurant, ndx|
+  lineup.restaurants.each_with_index do |restaurant, ndx|
     course = FactoryGirl.create(:course, :restaurant => restaurant, :name => "Course#{ndx}")
     dish = FactoryGirl.create(:dish, :course => course, :name => "Rated#{ndx}")
-    rating = FactoryGirl.create(:rating, :value => 5 - ndx, :user => user,
+    proposed_val = 5 - ndx
+    rat_val = proposed_val > 0 ? proposed_val : 1
+    rating = FactoryGirl.create(:rating, :value => rat_val, :user => user,
                                 :ratable_type => 'Restaurant', :ratable => restaurant)
   end
 end

@@ -13,7 +13,9 @@ Feature: View the daily lineup for today
   	Given I have a lineup with restaurants that have dishes that have ratings
   	When I go to the lineup for today
   	Then I should see Popular Dishes
-  	And I should see Rated1, Rated2
+	# popular dishes showing top 3 dishes...
+  	And I should see Rated1, Rated2, Rated3
+	And I should not see Rated4, Rated5, Rated5
   	
   Scenario: See that there are no popular dishes
     Given I have a lineup with restaurants that have no dishes with ratings
