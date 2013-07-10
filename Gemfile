@@ -12,11 +12,14 @@ group :development, :test do
   #gem 'cucumber-rails', :require => false
   gem 'cucumber',  '1.2.5'
   gem 'cucumber-rails', '1.3.0', :require => false
-  gem 'database_cleaner'
   gem 'rspec-rails'
+  gem 'factory_girl_rails'
+end
+
+group :test do
   gem 'capybara'
   gem 'launchy' # to pop up saved webpages?
-  gem 'factory_girl_rails'
+  gem 'database_cleaner'
   gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i # required for guard on mac
   gem 'wdm', :require => false if RUBY_PLATFORM =~ /mingw/i # required for guard on windows
   gem 'spork', '~> 1.0rc' # speed up interminable load times for testing
