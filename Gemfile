@@ -10,8 +10,8 @@ gem 'rails', '3.2.13'
 group :development, :test do
   gem 'debugger'
   #gem 'cucumber-rails', :require => false
-  gem 'cucumber',  '1.2.5'
-  gem 'cucumber-rails', '1.3.0', :require => false
+  #gem 'cucumber',  '1.2.5'
+  #gem 'cucumber-rails', '1.3.0', :require => false
   gem 'rspec-rails'
   gem 'factory_girl_rails'
 end
@@ -23,9 +23,10 @@ group :test do
   gem 'rb-fsevent', :require => false if RUBY_PLATFORM =~ /darwin/i # required for guard on mac
   gem 'wdm', :require => false if RUBY_PLATFORM =~ /mingw/i # required for guard on windows
   gem 'spork', '~> 1.0rc' # speed up interminable load times for testing
-  gem 'guard-cucumber'
+  #gem 'guard-cucumber'
   gem 'guard-rspec'
   gem 'guard-spork'
+  gem 'faker'
 end
 
 # Using postgres for all configurations now.

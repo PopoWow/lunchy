@@ -1,9 +1,11 @@
+require 'faker'
+
 FactoryGirl.define do
   factory :user do
     # Creates an normal user.  ex: create(:user)
-    sequence(:nickname) {|seq| "User#{seq}"}
+    nickname {Faker::Internet.user_name}
     password "123"
-    email    {"#{nickname}@example.com"}
+    email    {Faker::Internet.email}
     admin    false
 
     after(:create) { |user| user.activate! }

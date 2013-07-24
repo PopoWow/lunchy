@@ -6,7 +6,7 @@ guard 'spork', :wait => 120,
                :cucumber => false,
                #:rspec => false,
                :test_unit => false,
-               :cucumber_env => { 'RAILS_ENV' => 'test' },
+               #:cucumber_env => { 'RAILS_ENV' => 'test' },
                :rspec_env => { 'RAILS_ENV' => 'test' } do
   watch('config/application.rb')
   watch('config/environment.rb')
@@ -17,17 +17,7 @@ guard 'spork', :wait => 120,
   watch('spec/spec_helper.rb') { :rspec }
   watch('test/test_helper.rb') { :test_unit }
   watch(%r{features/support/}) { :cucumber }
-end
-
-guard 'cucumber', :cli => "--drb" do
-  watch(%r{^features/.+\.feature$})
-  watch(%r{^features/support/.+$})          { 'features' }
-  watch(%r{^features/step_definitions/(.+)_steps\.rb$}) { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
-  watch(%r{^app/views/(.+)$})               { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
-  watch(%r{^app/controllers/(.+)_controller.rb$}) { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
-
-  # Factory girl
-  watch('spec/factories.rb')                { 'features' }
+  watch(%r{app/models/(.+)\.rb})
 end
 
 guard :rspec, :cli => "--drb" do
@@ -53,3 +43,16 @@ guard :rspec, :cli => "--drb" do
   # Factory girl
   watch('spec/factories.rb')                          { 'spec' }
 end
+
+=begin
+guard :cucumber, :cli => "--drb" do
+  watch(%r{^features/.+\.feature$})
+  watch(%r{^features/support/.+$})          { 'features' }
+  watch(%r{^features/step_definitions/(.+)_steps\.rb$}) { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
+  watch(%r{^app/views/(.+)$})               { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
+  watch(%r{^app/controllers/(.+)_controller.rb$}) { |m| Dir[File.join("**/#{m[1]}.feature")][0] || 'features' }
+
+  # Factory girl
+  watch('spec/factories.rb')                { 'features' }
+end
+=end
