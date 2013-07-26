@@ -84,4 +84,13 @@ FactoryGirl.define do
     end
   end
 
+  factory :review do
+    title {Faker::Lorem.sentence(10)}
+    content {Faker::Lorem.paragraph}
+
+    factory :restaurant_review do
+      association :reviewable, factory: :restaurant
+    end
+  end
+
 end
